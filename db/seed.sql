@@ -23,6 +23,17 @@ INSERT INTO settings (key, value) VALUES
   ('quote_valid_days', '14');
 
 
+-- ---------- Budget ranges (the one-tap chips in the budget finder) ----------
+-- NULL = no limit on that side
+INSERT INTO budget_ranges (id, label, min_amount, max_amount, sort_order) VALUES
+  (1, 'Below 30,000',      NULL,  30000, 1),
+  (2, '30,000 – 50,000',   30000,  50000, 2),
+  (3, '50,000 – 100,000',  50000, 100000, 3),
+  (4, '100,000 – 200,000', 100000, 200000, 4),
+  (5, '200,000 – 300,000', 200000, 300000, 5),
+  (6, 'Above 300,000',     300000,  NULL, 6);
+
+
 -- ---------- Categories ----------
 -- We choose the id numbers ourselves (1 to 7) so the items below can use them.
 INSERT INTO categories (id, slug, name, sort_order) VALUES
@@ -97,31 +108,34 @@ INSERT INTO packages (id, slug, name, description, price, is_visible, sort_order
   (2, 'deluxe',  'Deluxe',  'Wedding or ruracio, about 100 guests.',  NULL, 0, 2),
   (3, 'premium', 'Premium', 'Full wedding, about 150 guests.',        NULL, 0, 3);
 
--- (package id, item id, how many). The item names are in the comments.
-INSERT INTO package_items (package_id, item_id, qty) VALUES
-  -- Starter
-  (1,  1,   2),   -- 80-Seater Tent + Lining
-  (1,  6, 100),   -- Dressed Plastic Armless Seat + Tie Back
-  (1, 23,  10),   -- Dressed Round Table
-  (1, 27,   1),   -- Welcome Signage
-  (1, 17,   4),   -- Flower Stand
-  -- Deluxe
-  (2,  1,   2),   -- 80-Seater Tent + Lining
-  (2, 12,   2),   -- Décor (Tent Draping)
-  (2,  4, 100),   -- Chiavari Seat
-  (2, 23,  10),   -- Dressed Round Table
-  (2, 34,  10),   -- Centre Piece (Large)
-  (2, 20,   1),   -- Photobooth (2-Phase)
-  (2, 14,   1),   -- Red Carpet Walkway (15 m)
-  (2, 28,   1),   -- Decorated Entrance Arc
-  -- Premium
-  (3, 41,   1),   -- A-Frame Tent, 20 × 5 m Section
-  (3, 13,   1),   -- Full Branded Stage
-  (3,  8, 150),   -- Chiavari Seat (Crystal Clear)
-  (3, 23,  15),   -- Dressed Round Table
-  (3, 38,   1),   -- Fresh Flowers (Stage Setup)
-  (3, 35,   2),   -- Chandelier (Medium)
-  (3, 21,   1),   -- Photobooth (3-Phase)
-  (3, 45,   1),   -- P.A. System
-  (3, 47,   1),   -- Video Coverage (3 Cameras)
-  (3, 44,   1);   -- Generator
+-- (package id, item id, how many, one per how many guests).
+-- qty = the amount for the example guest count in the description.
+-- per_guests NULL = the same amount whatever the guest count.
+-- The item names are in the comments. The per-guest numbers are our guesses: confirm with the office.
+INSERT INTO package_items (package_id, item_id, qty, per_guests) VALUES
+  -- Starter (about 100 guests)
+  (1,  1,   2,   80),   -- 80-Seater Tent + Lining: one per 80 guests
+  (1,  6, 100,    1),   -- Dressed Plastic Armless Seat + Tie Back: one per guest
+  (1, 23,  10,   10),   -- Dressed Round Table: one per 10 guests
+  (1, 27,   1, NULL),   -- Welcome Signage
+  (1, 17,   4, NULL),   -- Flower Stand
+  -- Deluxe (about 100 guests)
+  (2,  1,   2,   80),   -- 80-Seater Tent + Lining
+  (2, 12,   2,   80),   -- Décor (Tent Draping): one per tent
+  (2,  4, 100,    1),   -- Chiavari Seat
+  (2, 23,  10,   10),   -- Dressed Round Table
+  (2, 34,  10,   10),   -- Centre Piece (Large): one per table
+  (2, 20,   1, NULL),   -- Photobooth (2-Phase)
+  (2, 14,   1, NULL),   -- Red Carpet Walkway (15 m)
+  (2, 28,   1, NULL),   -- Decorated Entrance Arc
+  -- Premium (about 150 guests)
+  (3, 41,   1, NULL),   -- A-Frame Tent, 20 × 5 m Section
+  (3, 13,   1, NULL),   -- Full Branded Stage
+  (3,  8, 150,    1),   -- Chiavari Seat (Crystal Clear)
+  (3, 23,  15,   10),   -- Dressed Round Table
+  (3, 38,   1, NULL),   -- Fresh Flowers (Stage Setup)
+  (3, 35,   2, NULL),   -- Chandelier (Medium)
+  (3, 21,   1, NULL),   -- Photobooth (3-Phase)
+  (3, 45,   1, NULL),   -- P.A. System
+  (3, 47,   1, NULL),   -- Video Coverage (3 Cameras)
+  (3, 44,   1, NULL);   -- Generator

@@ -35,21 +35,41 @@ for (const item of items) {
   console.log('  ' + String(item.id).padStart(2) + '  ' + item.name.padEnd(46) + price.padStart(11) + flag);
 }
 
-// One more question: what would each example package cost?
-// SUM() adds up qty x price for every item in the package; GROUP BY = one answer per package.
-const packages = db.prepare(`
-  SELECT packages.name, SUM(package_items.qty * items.unit_price) AS total
+// One more question: what would each example package cost for a given number of guests?
+// For each item in the package:
+//   if per_guests is empty  -> use qty
+//   otherwise               -> guests / per_guests, rounded UP
+//     (whole-number trick for "rounded up": (guests + per_guests - 1) / per_guests)
+// SUM() adds up amount x price; GROUP BY = one answer per package.
+// The ? is filled in safely by .all(guests); never glue values into SQL text yourself.
+// CAST(? AS INTEGER): Node sends numbers as decimals; this makes it a whole number so the division rounds properly.
+const packageTotal = db.prepare(`
+  SELECT packages.name,
+         SUM(
+           CASE WHEN package_items.per_guests IS NULL THEN package_items.qty
+                ELSE (CAST(? AS INTEGER) + package_items.per_guests - 1) / package_items.per_guests
+           END * items.unit_price
+         ) AS total
   FROM packages
   JOIN package_items ON package_items.package_id = packages.id
   JOIN items ON items.id = package_items.item_id
   GROUP BY packages.id
   ORDER BY packages.sort_order
-`).all();
+`);
+
+const kes = (n) => ('KES ' + n.toLocaleString('en-KE')).padStart(15);
+const for100 = packageTotal.all(100);
+const for200 = packageTotal.all(200);
 
 console.log('\nEXAMPLE PACKAGES (hidden, contents still to confirm)');
-for (const p of packages) {
-  console.log('  ' + p.name.padEnd(10) + ('KES ' + p.total.toLocaleString('en-KE')).padStart(14));
-}
+console.log('  ' + ''.padEnd(10) + '100 guests'.padStart(15) + '200 guests'.padStart(15));
+for100.forEach(function (p, i) {
+  console.log('  ' + p.name.padEnd(10) + kes(p.total) + kes(for200[i].total));
+});
+
+// The budget chips, straight from the database
+const ranges = db.prepare('SELECT label FROM budget_ranges ORDER BY sort_order').all();
+console.log('\nBUDGET CHIPS: ' + ranges.map((r) => r.label).join(' | '));
 
 console.log('\n' + items.length + ' items on the price list.');
 db.close();

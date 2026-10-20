@@ -33,6 +33,20 @@ CREATE TABLE settings (
 
 
 -- ---------------------------------------------------------------------
+-- 1b. BUDGET RANGES: the one-tap budget chips in the budget finder
+--     ("Below 30,000", "30,000-50,000" ...). Kept here, not in the code,
+--     so the office can change them.
+-- ---------------------------------------------------------------------
+CREATE TABLE budget_ranges (
+  id         INTEGER PRIMARY KEY,
+  label      TEXT NOT NULL,                -- what the chip says
+  min_amount INTEGER CHECK (min_amount >= 0),   -- empty = no lower limit
+  max_amount INTEGER CHECK (max_amount >= 0),   -- empty = no upper limit ("Above 300,000")
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+
+-- ---------------------------------------------------------------------
 -- 2. CATEGORIES: the groups on the price list (Tents, Seating ...)
 -- ---------------------------------------------------------------------
 CREATE TABLE categories (
@@ -77,10 +91,17 @@ CREATE TABLE packages (
 
 -- Which items are in which package, and how many.
 -- This is a "link table": it joins packages and items.
+--
+-- Packages grow with the number of guests (budget finder rule):
+--   per_guests empty -> always exactly "qty" (e.g. 1 stage, 1 P.A. system)
+--   per_guests = 10  -> one for every 10 guests, rounded UP
+--                       (e.g. tables: 95 guests -> 10 tables)
+--   When we don't know the guest count yet, "qty" is used.
 CREATE TABLE package_items (
   package_id INTEGER NOT NULL REFERENCES packages(id) ON DELETE CASCADE,  -- delete package = delete its lines too
   item_id    INTEGER NOT NULL REFERENCES items(id),
   qty        INTEGER NOT NULL CHECK (qty > 0),
+  per_guests INTEGER CHECK (per_guests > 0),
   PRIMARY KEY (package_id, item_id)        -- the same item can't be listed twice in one package
 );
 
@@ -108,6 +129,10 @@ CREATE TABLE bookings (
   guests          INTEGER CHECK (guests > 0),
   area            TEXT,                     -- Kilifi town, Malindi, Watamu ...
   notes           TEXT,                     -- venue, colours, set-up time (from the customer)
+  -- Budget from the budget finder (all optional). An exact amount is saved
+  -- as min = max. "Above 300,000" has no max; "Below 30,000" has no min.
+  budget_min      INTEGER CHECK (budget_min >= 0),
+  budget_max      INTEGER CHECK (budget_max >= 0),
   transport_fee   INTEGER NOT NULL DEFAULT 0 CHECK (transport_fee >= 0),  -- added by the office
   discount        INTEGER NOT NULL DEFAULT 0 CHECK (discount >= 0),       -- added by the office
   deposit_percent INTEGER NOT NULL DEFAULT 50 CHECK (deposit_percent BETWEEN 0 AND 100),  -- copied from settings when the booking is made

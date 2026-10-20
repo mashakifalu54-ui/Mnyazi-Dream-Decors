@@ -258,6 +258,32 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 .footer-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
 .copyright { color: #9AA2BF; }
 
+/* ---------- 8b. Always-visible WhatsApp and Call buttons ---------- */
+.quick-contact {
+  position: fixed; right: 16px; bottom: 16px; z-index: 40;   /* "fixed" = stays put while the page scrolls */
+  display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+}
+.quick-btn {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 52px; padding: 0 18px 0 16px; border-radius: 999px;
+  font-weight: 800; text-decoration: none; box-shadow: var(--shadow);
+}
+.quick-btn svg { width: 22px; height: 22px; }
+.quick-whatsapp { background: var(--navy); color: #fff; border: 1.5px solid var(--gold); }
+.quick-call { background: var(--surface); color: var(--text); border: 1.5px solid var(--line); }
+/* Phones: round icon-only buttons so they cover less of the page */
+@media (max-width: 760px) {
+  .quick-btn { width: 52px; padding: 0; justify-content: center; }
+  .quick-btn span { display: none; }   /* the aria-label still tells screen readers what it does */
+}
+/* Laptops: the hero's bottom row (address + pause button) keeps a clear space on the right
+   for the floating buttons. 186px = button width + gaps, minus the empty margin the page already has. */
+@media (min-width: 761px) {
+  .hero-bar { padding-right: max(0px, 186px - max(16px, (100vw - 1180px) / 2 + 16px)); }
+}
+/* Leave room at the bottom of the page so the buttons never cover the footer text */
+.site-footer { padding-bottom: 140px; }
+
 /* ---------- 9. Photo viewer pop-up ---------- */
 .viewer { border: 0; padding: 0; background: transparent; width: min(1000px, 94vw); max-height: 96vh; color: #fff; }
 .viewer::backdrop { background: rgba(6, 10, 26, .92); }   /* dark screen behind the photo */

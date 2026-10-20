@@ -57,3 +57,15 @@ Inspired by True Safari Adventure's "Search Packages" form (dropdowns for budget
 - Quote drawer budget bar: "KES 62,000 of 80,000 used, 18,000 left"; gold near the limit, warning when over (customer may still go over). "Often added" suggests items that fit the money left.
 - The booking stores budget_min, budget_max (or exact budget), guests and event type; the admin booking page shows the budget beside the quote total.
 - Every field is optional: a customer can skip straight to choosing items.
+
+## Real packages (added 20 Oct 2026)
+Use db/packages-2024.json for the prototype (from docs/rate-card-2024.pdf, an OLD 2024 card; the client will send the updated one, so prices must be easy to change from the admin page). It replaces the Starter/Deluxe/Premium examples:
+- White Wedding: Basic Celebration 40,000; Elegant Gathering 50,000; Deluxe Event 60,000; Premium Celebration 80,000; Ultimate Event Experience 100,000.
+- Church: Package 1 10,000; Package 2 15,000.
+- Malozi / Kuhaswa: Basic 35,000; Elegant 45,000; Deluxe 60,000; Premium 80,000; Ultimate 100,000.
+- Hire: 100-seater tent 3,500; 50-seater tent 2,500; gazebo 1,500; white armless chair 20 each.
+Rules from the card: all packages can be customised; round tables are included; packages EXCLUDE tents and chairs (the price is the décor; tents and chairs are hired on top, so the quote must add them, e.g. by guest count). Banquet and Chiavari chairs available.
+Packages have a fixed price plus an "includes" list of text lines (not item rows). Customising a package = package price plus extra items from the price list; removing a package line is a note for the office, not an automatic discount.
+Event types (from the card): Malozi/Kuhaswa, Wedding, Church, Baby Shower, Birthday, Graduation, Farewell, Corporate.
+Price conflicts to ask the office about: tents (card: 50-seater 2,500, 100-seater 3,500; spreadsheet: 80-seater 3,000, 100-seater draped canopy 3,500) and chairs (card: 20 per white armless chair; spreadsheet: dressed plastic 100, chiavari 250).
+Budget finder ranges, updated to fit these packages: Below 20,000 / 20,000-40,000 / 40,000-60,000 / 60,000-80,000 / 80,000-100,000 / Above 100,000 (plus tents and chairs).

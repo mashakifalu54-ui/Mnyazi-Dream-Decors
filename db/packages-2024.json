@@ -1,0 +1,217 @@
+{
+  "source": "docs/rate-card-2024.pdf (Mnyazi rate card, 28 Nov 2024, OLD prices, used for the prototype only)",
+  "notes": [
+    "All packages can be customised.",
+    "Round tables are included in packages.",
+    "Packages are exclusive of tents and chairs (the décor price does not include hiring the tents and chairs themselves).",
+    "Banquet and Chiavari chairs available."
+  ],
+  "event_types": [
+    "Malozi / Kuhaswa",
+    "Weddings",
+    "Church",
+    "Baby Shower",
+    "Birthday Party",
+    "Graduation Party",
+    "Farewell Party",
+    "Corporate Events"
+  ],
+  "packages": [
+    {
+      "category": "White Wedding",
+      "name": "Basic Celebration",
+      "price_kes": 40000,
+      "includes": [
+        "Artificial flowers & 4 stands",
+        "Décor for 2 cars",
+        "3 covered round tables + centrepieces",
+        "30 covered seats + tie backs",
+        "Draped + backdrop 50-seater tent + red carpet",
+        "Photo booth",
+        "Draped gazebo",
+        "Welcome signage"
+      ],
+      "guests_seated": 30
+    },
+    {
+      "category": "White Wedding",
+      "name": "Elegant Gathering",
+      "price_kes": 50000,
+      "includes": [
+        "Artificial flowers & 6 stands, entrance arch",
+        "Décor for 4 cars",
+        "5 covered round tables + centrepieces",
+        "75 covered seats + tie backs",
+        "Draped gazebo + canopy",
+        "2 draped 50-seater guest tents",
+        "Draped + backdrop 50-seater tent (main tent)",
+        "Red carpet, walkway, photo booth",
+        "Welcome signage"
+      ],
+      "guests_seated": 75
+    },
+    {
+      "category": "White Wedding",
+      "name": "Deluxe Event",
+      "price_kes": 60000,
+      "includes": [
+        "Fresh flowers & 6 stands, entrance arch",
+        "Décor for 6 cars",
+        "11 covered round tables, 100 covered seats + tie backs",
+        "Draped + backdrop + canopy 50-seater tent (main tent)",
+        "Draped gazebo + canopy, walkway + entrance arch",
+        "2 draped 50-seater guest tents, photo booth",
+        "Welcome signage"
+      ],
+      "guests_seated": 100
+    },
+    {
+      "category": "White Wedding",
+      "name": "Premium Celebration",
+      "price_kes": 80000,
+      "includes": [
+        "Fresh flowers & 6 stands, entrance arch",
+        "Décor for 8 cars",
+        "15 covered round tables + fresh flower centrepieces",
+        "200 covered seats + tie backs",
+        "Draped + backdrop + red carpet 50-seater tent (main tent)",
+        "Draped + red carpet for guest tent",
+        "Walkway, photo booth",
+        "Gazebo + canopy",
+        "Welcome signage"
+      ],
+      "guests_seated": 200
+    },
+    {
+      "category": "White Wedding",
+      "name": "Ultimate Event Experience",
+      "price_kes": 100000,
+      "includes": [
+        "Fresh flowers & 6 stands, entrance arch",
+        "Décor for 10 cars",
+        "20 covered round tables + fresh flower centrepieces",
+        "300 covered seats + tie backs",
+        "Backdrop + canopy + red carpet for a 50-seater tent (main tent)",
+        "Red carpet for 2 draped 50-seater guest tents",
+        "Walkway, branded dance floor",
+        "Gazebo + canopy",
+        "Photo booth, welcome signage"
+      ],
+      "guests_seated": 300
+    },
+    {
+      "category": "Church",
+      "name": "Church Package 1",
+      "price_kes": 10000,
+      "includes": [
+        "Walkway + 6 stands",
+        "6 dressed chairs",
+        "2 white pillows"
+      ],
+      "guests_seated": null
+    },
+    {
+      "category": "Church",
+      "name": "Church Package 2",
+      "price_kes": 15000,
+      "includes": [
+        "Altar decoration, entrance arch",
+        "Walkway + 6 stands",
+        "10 dressed chairs",
+        "2 white pillows"
+      ],
+      "guests_seated": null
+    },
+    {
+      "category": "Malozi / Kuhaswa",
+      "name": "Basic Celebration",
+      "price_kes": 35000,
+      "includes": [
+        "Traditional clothes & items decorations",
+        "3 covered round tables, 30 covered seats",
+        "Draped + backdrop 50-seater tent + red carpet",
+        "Photo booth, draped gazebo",
+        "Welcome signage"
+      ],
+      "guests_seated": 30
+    },
+    {
+      "category": "Malozi / Kuhaswa",
+      "name": "Elegant Gathering",
+      "price_kes": 45000,
+      "includes": [
+        "Traditional clothes & items decorations",
+        "5 covered round tables, 75 covered seats",
+        "Draped gazebo + canopy",
+        "2 draped 50-seater guest tents",
+        "Walkway with red carpet",
+        "Photo booth, welcome signage"
+      ],
+      "guests_seated": 75
+    },
+    {
+      "category": "Malozi / Kuhaswa",
+      "name": "Deluxe Event",
+      "price_kes": 60000,
+      "includes": [
+        "Traditional clothes & items decorations",
+        "11 covered round tables + fresh flower centrepieces",
+        "100 covered seats, walkway + fresh flowers",
+        "2 draped 50-seater guest tents",
+        "Draped gazebo + canopy, photo booth",
+        "Welcome signage"
+      ],
+      "guests_seated": 100
+    },
+    {
+      "category": "Malozi / Kuhaswa",
+      "name": "Premium Celebration",
+      "price_kes": 80000,
+      "includes": [
+        "Traditional clothes & items decorations",
+        "15 covered round tables + fresh flower centrepieces",
+        "200 covered seats, draped + backdrop + red carpet",
+        "2 draped 50-seater guest tents",
+        "Traditional walkway, photo booth",
+        "Welcome signage"
+      ],
+      "guests_seated": 200
+    },
+    {
+      "category": "Malozi / Kuhaswa",
+      "name": "Ultimate Event Experience",
+      "price_kes": 100000,
+      "includes": [
+        "Traditional clothes & items decorations",
+        "20 covered round tables + fresh flower centrepieces",
+        "300 covered seats",
+        "2 draped 100-seater tents",
+        "Traditional walkway, branded dance floor",
+        "Photo booth, welcome signage"
+      ],
+      "guests_seated": 300
+    }
+  ],
+  "hire_items": [
+    {
+      "name": "100-seater tent",
+      "price_kes": 3500,
+      "unit": "each"
+    },
+    {
+      "name": "50-seater tent",
+      "price_kes": 2500,
+      "unit": "each"
+    },
+    {
+      "name": "Gazebo",
+      "price_kes": 1500,
+      "unit": "each"
+    },
+    {
+      "name": "White armless chair",
+      "price_kes": 20,
+      "unit": "per piece"
+    }
+  ]
+}

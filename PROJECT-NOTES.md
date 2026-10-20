@@ -58,3 +58,6 @@ See CLAUDE.md for the quote, invoice, receipt flow, WhatsApp sending and the rev
 ## Growth and maintenance (20 Oct 2026)
 - WhatsApp reminder queue and local search pages: see CLAUDE.md "Growth features".
 - Monthly care plans offer for Mnyazi: written as a Docs document (Timothy has the link). Suggested plans: Care 2,000 KES/month, Care Plus 3,000, Growth 5,000 (prices are Timothy's to confirm).
+
+## Rate card (20 Oct 2026)
+Old 2024 rate card received: docs/rate-card-2024.pdf, data in db/packages-2024.json. Use for the prototype; the updated card is coming from the client. See CLAUDE.md "Real packages".

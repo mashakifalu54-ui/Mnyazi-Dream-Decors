@@ -7,8 +7,13 @@
     "node": ">=22.13"
   },
   "scripts": {
+    "start": "node server.js",
     "db:setup": "node db/setup.js",
     "db:reset": "node db/setup.js --reset",
     "db:check": "node db/check.js"
-  }
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "main": "server.js"
 }

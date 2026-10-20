@@ -48,7 +48,7 @@ const count = (table) => db.prepare('SELECT COUNT(*) AS n FROM ' + table).get().
 console.log('Database created: ' + DB_FILE);
 console.log('  categories: ' + count('categories'));
 console.log('  items:      ' + count('items'));
-console.log('  packages:   ' + count('packages') + ' (hidden examples)');
+console.log('  packages:   ' + count('packages') + ' (from the 2024 rate card)');
 console.log('Next: npm run db:check   (prints the price list from the database)');
 
 db.close();

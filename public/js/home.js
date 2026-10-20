@@ -1,13 +1,13 @@
 /*
   home.js: the moving parts of the homepage.
   1. Motion switch (is the visitor OK with animation?)
-  2. Phone menu (open / close)
+  2. Phone menu: moved to js/common.js
   3. Hero slideshow (new photo every 6 seconds, progress lines, pause button)
   4. Parallax (hero photo moves slower than the page)
   5. Sideways gallery (slides while scrolling on laptops, swipe on phones)
   6. Rise-in on scroll
   7. Photo viewer (tap a photo to see it big; arrows, swipe, Esc)
-  8. Footer year
+  8. Footer year: moved to js/common.js
 */
 
 // ---------- 1. Motion switch ----------
@@ -18,24 +18,7 @@ if (!wantsLessMotion) {
 }
 
 
-// ---------- 2. Phone menu ----------
-const menuBtn = document.getElementById('menuBtn');
-const mainNav = document.getElementById('mainNav');
-
-menuBtn.addEventListener('click', function () {
-  // toggle() adds the class if it is missing, removes it if it is there.
-  // It returns true when the class is now ON (menu open).
-  const isOpen = mainNav.classList.toggle('is-open');
-  menuBtn.setAttribute('aria-expanded', isOpen);   // tells screen readers if the menu is open
-});
-
-// Close the menu after a link is tapped (otherwise it covers the page)
-mainNav.addEventListener('click', function (event) {
-  if (event.target.tagName === 'A') {
-    mainNav.classList.remove('is-open');
-    menuBtn.setAttribute('aria-expanded', 'false');
-  }
-});
+// ---------- 2. Phone menu: now in js/common.js (shared by every page) ----------
 
 
 // ---------- 3. Hero slideshow ----------
@@ -226,5 +209,4 @@ viewer.addEventListener('touchend', function (event) {
 });
 
 
-// ---------- 8. Footer year ----------
-document.getElementById('year').textContent = new Date().getFullYear();
+// ---------- 8. Footer year: now in js/common.js ----------

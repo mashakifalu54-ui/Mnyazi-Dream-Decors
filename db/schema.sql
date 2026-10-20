@@ -34,14 +34,14 @@ CREATE TABLE settings (
 
 -- ---------------------------------------------------------------------
 -- 1b. BUDGET RANGES: the one-tap budget chips in the budget finder
---     ("Below 30,000", "30,000-50,000" ...). Kept here, not in the code,
+--     ("Below 20,000", "20,000-40,000" ...). Kept here, not in the code,
 --     so the office can change them.
 -- ---------------------------------------------------------------------
 CREATE TABLE budget_ranges (
   id         INTEGER PRIMARY KEY,
   label      TEXT NOT NULL,                -- what the chip says
   min_amount INTEGER CHECK (min_amount >= 0),   -- empty = no lower limit
-  max_amount INTEGER CHECK (max_amount >= 0),   -- empty = no upper limit ("Above 300,000")
+  max_amount INTEGER CHECK (max_amount >= 0),   -- empty = no upper limit ("Above 100,000")
   sort_order INTEGER NOT NULL DEFAULT 0
 );
 
@@ -76,33 +76,40 @@ CREATE TABLE items (
 
 
 -- ---------------------------------------------------------------------
--- 4. PACKAGES: ready-made sets (Starter, Deluxe, Premium).
---    The items inside each package are in the next table.
+-- 4. PACKAGES: ready-made décor sets from the client's rate card
+--    (White Wedding, Church, Malozi / Kuhaswa). Each has ONE fixed price.
+--    From the card: packages do NOT include tents and chairs; those are
+--    hired on top, so the quote adds them separately.
 -- ---------------------------------------------------------------------
 CREATE TABLE packages (
-  id          INTEGER PRIMARY KEY,
-  slug        TEXT NOT NULL UNIQUE,
-  name        TEXT NOT NULL,
-  description TEXT,
-  price       INTEGER CHECK (price >= 0),   -- a fixed package price; empty = add up the item prices
-  is_visible  INTEGER NOT NULL DEFAULT 0 CHECK (is_visible IN (0, 1)),
-  sort_order  INTEGER NOT NULL DEFAULT 0
+  id            INTEGER PRIMARY KEY,
+  slug          TEXT NOT NULL UNIQUE,      -- short name for links, e.g. 'white-wedding-basic'
+  category      TEXT NOT NULL,             -- 'White Wedding', 'Church', 'Malozi / Kuhaswa'
+  name          TEXT NOT NULL,             -- e.g. 'Basic Celebration'
+  price         INTEGER NOT NULL CHECK (price >= 0),   -- KES, the office changes it on the admin page
+  guests_seated INTEGER CHECK (guests_seated > 0),     -- how many covered seats it includes; empty = not about guests (Church)
+  is_visible    INTEGER NOT NULL DEFAULT 1 CHECK (is_visible IN (0, 1)),
+  sort_order    INTEGER NOT NULL DEFAULT 0
 );
 
--- Which items are in which package, and how many.
--- This is a "link table": it joins packages and items.
---
--- Packages grow with the number of guests (budget finder rule):
---   per_guests empty -> always exactly "qty" (e.g. 1 stage, 1 P.A. system)
---   per_guests = 10  -> one for every 10 guests, rounded UP
---                       (e.g. tables: 95 guests -> 10 tables)
---   When we don't know the guest count yet, "qty" is used.
-CREATE TABLE package_items (
+-- What each package includes, as lines of text exactly like the rate card
+-- ("Décor for 2 cars", "Photo booth" ...). They are words, not price-list
+-- items: removing one is a note for the office, not an automatic discount.
+CREATE TABLE package_includes (
+  id         INTEGER PRIMARY KEY,
   package_id INTEGER NOT NULL REFERENCES packages(id) ON DELETE CASCADE,  -- delete package = delete its lines too
-  item_id    INTEGER NOT NULL REFERENCES items(id),
-  qty        INTEGER NOT NULL CHECK (qty > 0),
-  per_guests INTEGER CHECK (per_guests > 0),
-  PRIMARY KEY (package_id, item_id)        -- the same item can't be listed twice in one package
+  line       TEXT NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+
+-- ---------------------------------------------------------------------
+-- 4b. EVENT TYPES: the choices in the "Type of event" box (from the rate card).
+-- ---------------------------------------------------------------------
+CREATE TABLE event_types (
+  id         INTEGER PRIMARY KEY,
+  name       TEXT NOT NULL UNIQUE,
+  sort_order INTEGER NOT NULL DEFAULT 0
 );
 
 
@@ -124,13 +131,13 @@ CREATE TABLE bookings (
                     'cancelled')),
   customer_name   TEXT NOT NULL,
   phone           TEXT NOT NULL,            -- Kenyan number, stored as 2547XXXXXXXX
-  event_type      TEXT NOT NULL,            -- Wedding, Ruracio, Birthday ...
+  event_type      TEXT NOT NULL,            -- one of event_types (copied as words, so old bookings keep it)
   event_date      TEXT NOT NULL,            -- 'YYYY-MM-DD' (SQLite keeps dates as text)
   guests          INTEGER CHECK (guests > 0),
   area            TEXT,                     -- Kilifi town, Malindi, Watamu ...
   notes           TEXT,                     -- venue, colours, set-up time (from the customer)
   -- Budget from the budget finder (all optional). An exact amount is saved
-  -- as min = max. "Above 300,000" has no max; "Below 30,000" has no min.
+  -- as min = max. "Above 100,000" has no max; "Below 20,000" has no min.
   budget_min      INTEGER CHECK (budget_min >= 0),
   budget_max      INTEGER CHECK (budget_max >= 0),
   transport_fee   INTEGER NOT NULL DEFAULT 0 CHECK (transport_fee >= 0),  -- added by the office
@@ -195,6 +202,7 @@ CREATE TABLE payments (
 --    searches fast. They don't change any data.
 -- ---------------------------------------------------------------------
 CREATE INDEX idx_items_category      ON items(category_id);
+CREATE INDEX idx_includes_package    ON package_includes(package_id);
 CREATE INDEX idx_bookings_status     ON bookings(status);
 CREATE INDEX idx_bookings_event_date ON bookings(event_date);
 CREATE INDEX idx_lines_booking       ON booking_lines(booking_id);

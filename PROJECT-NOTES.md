@@ -54,3 +54,7 @@ Package contents and prices; stock counts; deposit %; M-Pesa Paybill/Till; trans
 
 ## Documents and reviews (decided 20 Oct 2026)
 See CLAUDE.md for the quote, invoice, receipt flow, WhatsApp sending and the reviews design.
+
+## Growth and maintenance (20 Oct 2026)
+- WhatsApp reminder queue and local search pages: see CLAUDE.md "Growth features".
+- Monthly care plans offer for Mnyazi: written as a Docs document (Timothy has the link). Suggested plans: Care 2,000 KES/month, Care Plus 3,000, Growth 5,000 (prices are Timothy's to confirm).

@@ -1,0 +1,11 @@
+# Files git should NOT save to GitHub
+
+# The database holds real customer names and phone numbers: keep it off GitHub.
+# Anyone can rebuild an empty one with: npm run db:setup
+data/
+
+# Secret keys (M-Pesa etc.) go in .env and must never be shared
+.env
+
+# Packages installed by npm (can always be reinstalled)
+node_modules/

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<!--
+  HOMEPAGE for Mnyazi Dream Decor.
+  This file only holds the CONTENT and STRUCTURE of the page (HTML).
+  - The look (colours, sizes, layout, light/dark mode) lives in css/site.css
+  - The moving parts (slideshow, sideways gallery, photo viewer, phone menu) live in js/home.js
+  Design rules come from DESIGN-PROMPT.md in the project folder.
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <!-- Makes the page fit phone screens instead of showing a tiny desktop page -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Tells the browser this page has both a light and a dark design -->
+  <meta name="color-scheme" content="light dark">
+  <title>Mnyazi Dream Decor | Event tents, décor and stages in Kilifi</title>
+  <meta name="description"
+    content="Tents, décor, stages, seating and sound for weddings, ruracios, birthdays and corporate events on the Kenyan coast. Based in Kilifi.">
+
+  <!-- Brand fonts from Google Fonts: Marcellus for headings, Manrope for text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Marcellus&family=Manrope:wght@400;600;700;800&display=swap">
+
+  <link rel="stylesheet" href="css/site.css">
+</head>
+
+<body>
+
+  <!-- ===================== HEADER (stays at the top) ===================== -->
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-name">Mnyazi Dream Decor</span>
+      </a>
+
+      <!-- On phones this button shows/hides the menu (see js/home.js) -->
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mainNav">Menu</button>
+
+      <nav class="main-nav" id="mainNav" aria-label="Main">
+        <a href="#services">What we offer</a>
+        <a href="#work">Our work</a>
+        <a href="#how">How booking works</a>
+        <a href="#contact">Contact</a>
+        <a class="btn btn-gold btn-small"
+          href="https://wa.me/254793463223?text=Hello%20Mnyazi%20Dream%20Decor%2C%20I%20would%20like%20a%20quote%20for%20my%20event."
+          target="_blank" rel="noopener">Get a quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- ===================== HERO (big photo slideshow) ===================== -->
+    <section class="hero" id="hero" aria-label="Welcome">
+      <!-- The slideshow: only the photo with class "is-active" is visible.
+           js/home.js moves that class to the next photo every 6 seconds.
+           Only the FIRST photo loads straight away (fast on slow phones);
+           the others wait in data-src and js/home.js loads them once the page is ready. -->
+      <div class="hero-slides" id="heroSlides">
+        <img class="is-active" src="images/hero-tents-aerial.jpg"
+          alt="Row of white pagoda tents and a red carpet aisle on a garden lawn, seen from above">
+        <img data-src="images/hero-wedding-tent.jpg"
+          alt="Draped white wedding tent with Chiavari chairs, a flower-lined walkway and a branded dance floor">
+        <img data-src="images/hero-canopy-carpet.jpg"
+          alt="Decorated canopy over a red carpet, with carved pillars and red roses">
+        <img data-src="images/hero-beach-gazebo.jpg" alt="White gazebo with a round table set up on a lawn by the ocean">
+        <img data-src="images/hero-tent-rows.jpg" alt="Two decorated pagoda tents with rows of white seats">
+      </div>
+
+      <div class="wrap hero-text">
+        <p class="eyebrow">Tents · Décor · Stages · Sound · Kilifi</p>
+        <h1>Your event, <em>dressed beautifully</em> on the coast.</h1>
+        <p class="lede">Weddings, ruracios, birthdays and corporate events. We bring the tents, seating, décor, stages
+          and sound, and set everything up for you.</p>
+        <div class="hero-buttons">
+          <a class="btn btn-gold"
+            href="https://wa.me/254793463223?text=Hello%20Mnyazi%20Dream%20Decor%2C%20I%20would%20like%20a%20quote%20for%20my%20event."
+            target="_blank" rel="noopener">Get a quote on WhatsApp</a>
+          <a class="btn btn-outline-light" href="#work">See our work</a>
+        </div>
+
+        <div class="hero-bar">
+          <span>Along St Thomas – Prison Road, Kilifi · <a href="tel:+254793463223">0793 463 223</a></span>
+          <div class="slide-controls">
+            <!-- One thin line per photo; the gold fill shows how long until the next photo.
+                 js/home.js creates the lines. -->
+            <div class="slide-progress" id="slideProgress" aria-hidden="true"></div>
+            <!-- Pause button: always visible, some people find moving pictures distracting -->
+            <button class="round-btn" id="slideToggle" type="button" aria-label="Pause slideshow">
+              <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" /></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7z" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== WHAT WE OFFER ===================== -->
+    <!-- "reveal" = rises and fades in once when you scroll to it (see css/site.css) -->
+    <section class="section" id="services">
+      <div class="wrap">
+        <div class="reveal">
+          <p class="eyebrow">What we offer</p>
+          <h2>Everything for the day, from one team</h2>
+          <p class="section-intro">Hire single items or a full set-up. We deliver, set up and collect.</p>
+        </div>
+
+        <ul class="services reveal">
+          <li>
+            <h3>Tents &amp; canopies</h3>
+            <p>80-seater tents, A-frame and B-line tents, gazebos and draped canopies.</p>
+          </li>
+          <li>
+            <h3>Seating &amp; tables</h3>
+            <p>Chiavari and dressed seats, bridal seats, round, rectangle and half-moon glass tables.</p>
+          </li>
+          <li>
+            <h3>Décor &amp; flowers</h3>
+            <p>Tent draping, bridal tents, centre pieces, chandeliers and fresh flowers.</p>
+          </li>
+          <li>
+            <h3>Stages &amp; walkways</h3>
+            <p>Branded stages, red carpets, white walkways, welcome signage and entrance arcs.</p>
+          </li>
+          <li>
+            <h3>Photobooths</h3>
+            <p>One, two or three-phase photobooths with custom printed boards.</p>
+          </li>
+          <li>
+            <h3>Sound, power &amp; video</h3>
+            <p>P.A. system, generator, flood lights and video coverage with live streaming.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== OUR WORK (sideways photo gallery) ===================== -->
+    <!-- On a laptop the photos slide sideways while you scroll down.
+         On a phone you swipe them sideways with your finger. js/home.js decides which. -->
+    <section class="work" id="work" aria-label="Our work">
+      <div class="work-pin" id="workPin">
+        <div class="wrap">
+          <p class="eyebrow">Our work</p>
+          <h2>Recent set-ups on the coast</h2>
+          <p class="section-intro">Weddings, ruracios and birthdays we have dressed. Tap a photo to see it bigger.</p>
+        </div>
+
+        <!-- Each photo is a button so it works with a mouse, a finger or the keyboard. -->
+        <div class="work-track" id="workTrack">
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-flower-pillars.jpg" alt="Rose-covered pillars in front of pagoda tents and a red carpet" loading="lazy"></span>
+            <span class="shot-caption"><b>Garden wedding</b>Rose pillars and pagoda tents</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-bridal-canopy.jpg" alt="Bridal canopy with a flower-covered head table on a red carpet" loading="lazy"></span>
+            <span class="shot-caption"><b>Bridal canopy</b>Head table on a red carpet</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-dance-floor.jpg" alt="White dance floor printed with the couple's names inside a draped tent" loading="lazy"></span>
+            <span class="shot-caption"><b>Branded dance floor</b>Inside a fully draped tent</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-gold-table.jpg" alt="Gold and glass head table with fresh flowers and tall gold chairs" loading="lazy"></span>
+            <span class="shot-caption"><b>Gold head table</b>Glass top and fresh flowers</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-welcome-board.jpg" alt="Red welcome board with the couple's photos for a wedding" loading="lazy"></span>
+            <span class="shot-caption"><b>Welcome board</b>Printed for the couple</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-ocean-table.jpg" alt="Round table with patterned seat sashes and a gourd centre piece by the ocean" loading="lazy"></span>
+            <span class="shot-caption"><b>By the ocean</b>Traditional touches</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-aerial-lawn.jpg" alt="Full lawn set-up of tents and seating, seen from above" loading="lazy"></span>
+            <span class="shot-caption"><b>Full lawn set-up</b>Seen from above</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-gazebo-guests.jpg" alt="Guests under a decorated gazebo" loading="lazy"></span>
+            <span class="shot-caption"><b>Gazebo</b>Shade for the guests</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-head-table.jpg" alt="Decorated head table for the couple" loading="lazy"></span>
+            <span class="shot-caption"><b>Head table</b>Dressed for the couple</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-long-tables.jpg" alt="Long dressed tables set for guests" loading="lazy"></span>
+            <span class="shot-caption"><b>Long tables</b>Set for the reception</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-round-table.jpg" alt="Dressed round table with seats" loading="lazy"></span>
+            <span class="shot-caption"><b>Round tables</b>Dressed seats and covers</span>
+          </button>
+          <button class="shot" type="button">
+            <span class="shot-frame"><img src="images/work-tents-side.jpg" alt="Decorated tents seen from the side" loading="lazy"></span>
+            <span class="shot-caption"><b>Pagoda tents</b>With coloured draping</span>
+          </button>
+        </div>
+
+        <p class="wrap work-hint" id="workHint">Swipe sideways to see more →</p>
+      </div>
+    </section>
+
+    <!-- ===================== HOW BOOKING WORKS ===================== -->
+    <section class="section" id="how">
+      <div class="wrap">
+        <div class="reveal">
+          <p class="eyebrow">How booking works</p>
+          <h2>From quote to set-up in four steps</h2>
+        </div>
+
+        <ol class="steps reveal">
+          <li>
+            <h3>Tell us what you need</h3>
+            <p>Send your date, venue, number of guests and the items you want.</p>
+          </li>
+          <li>
+            <h3>Get your quote</h3>
+            <p>We check that everything is free on your date and send a clear quote on WhatsApp.</p>
+          </li>
+          <li>
+            <h3>Pay the deposit</h3>
+            <p>Your date is held once the M-Pesa deposit arrives.</p>
+          </li>
+          <li>
+            <h3>We set up</h3>
+            <p>Our team delivers and sets everything up before your guests arrive.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===================== CONTACT ===================== -->
+    <section class="section section-tint" id="contact">
+      <div class="wrap contact">
+        <div class="reveal">
+          <p class="eyebrow">Visit or call</p>
+          <h2>Let's plan your event</h2>
+          <p class="section-intro">Visit our office in Kilifi to see the tents and décor, or send us a message any time.</p>
+        </div>
+
+        <div class="contact-card reveal">
+          <dl>
+            <dt>Office</dt>
+            <dd>Along St Thomas – Prison Road, Kilifi</dd>
+            <dt>Phone / WhatsApp</dt>
+            <dd><a href="tel:+254793463223">0793 463 223</a></dd>
+          </dl>
+          <div class="contact-buttons">
+            <a class="btn btn-gold"
+              href="https://wa.me/254793463223?text=Hello%20Mnyazi%20Dream%20Decor%2C%20I%20would%20like%20a%20quote%20for%20my%20event."
+              target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a class="btn btn-outline" href="tel:+254793463223">Call us</a>
+            <!-- TODO: replace with the exact office map pin when the client sends it -->
+            <a class="btn btn-outline" href="https://www.google.com/maps/search/?api=1&amp;query=Prison+Road+Kilifi"
+              target="_blank" rel="noopener">Open in Google Maps</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <p><strong>Mnyazi Dream Decor</strong><br>Event tents, décor, stages and sound on the Kenyan coast.</p>
+      <p>Along St Thomas – Prison Road, Kilifi<br><a href="tel:+254793463223">0793 463 223</a> ·
+        <a href="https://wa.me/254793463223" target="_blank" rel="noopener">WhatsApp</a></p>
+      <!-- The year is filled in by js/home.js so it never goes out of date -->
+      <p class="copyright">© <span id="year">2026</span> Mnyazi Dream Decor</p>
+    </div>
+  </footer>
+
+  <!-- ===================== PHOTO VIEWER (hidden until a photo is tapped) ===================== -->
+  <!-- <dialog> is a built-in HTML pop-up. It closes with the Esc key by itself. -->
+  <dialog class="viewer" id="viewer" aria-label="Photo viewer">
+    <img id="viewerImg" src="" alt="">
+    <div class="viewer-bar">
+      <button class="round-btn" type="button" id="viewerPrev" aria-label="Previous photo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+      </button>
+      <p id="viewerCaption"></p>
+      <button class="round-btn" type="button" id="viewerNext" aria-label="Next photo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+      <button class="round-btn" type="button" id="viewerClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </div>
+  </dialog>
+
+  <!-- JavaScript goes last so the page shows first, then becomes interactive -->
+  <script src="js/home.js"></script>
+</body>
+
+</html>

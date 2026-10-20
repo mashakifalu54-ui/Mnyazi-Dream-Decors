@@ -1,0 +1,278 @@
+/*
+  site.css: the LOOK of the Mnyazi Dream Decor website.
+  Shared by every public page, so the brand stays the same everywhere.
+  Rules come from DESIGN-PROMPT.md (navy + one gold accent, warm off-white,
+  Marcellus + Manrope, light AND dark mode, motion that can be switched off).
+*/
+
+/* ---------- 1. Colour and size "tokens" ----------
+   Every colour is a named variable. The page only uses the names,
+   so dark mode just gives the same names different values. */
+:root {
+  --navy: #15224A;          /* brand colour (header, dark sections) */
+  --navy-deep: #0B1430;
+  --gold: #C9A227;          /* the ONE accent: the main action on the screen */
+  --on-gold: #141B33;       /* text on gold buttons */
+
+  --bg: #F7F5F0;            /* warm off-white page background */
+  --surface: #FFFFFF;       /* cards */
+  --tint: #EEEBE3;          /* slightly darker band for some sections */
+  --text: #141B33;          /* normal text (navy-tinted, never pure black) */
+  --muted: #555D75;         /* softer text, still readable (AA contrast) */
+  --line: #DFDCD3;          /* thin borders */
+  --gold-text: #7A5F12;     /* gold dark enough to read on light backgrounds */
+
+  --shadow: 0 18px 40px -20px rgba(21, 34, 74, .35);   /* the ONE shadow style */
+  --radius: 14px;
+  --header-height: 68px;
+
+  --font-heading: "Marcellus", Georgia, serif;
+  --font-text: "Manrope", system-ui, "Segoe UI", sans-serif;
+}
+
+/* Dark mode: used when the visitor's phone/computer is set to dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0B1024;
+    --surface: #141B36;
+    --tint: #111833;
+    --text: #ECEEF6;
+    --muted: #A9B0C7;
+    --line: #2A3459;
+    --gold-text: #E2C463;
+    --shadow: 0 18px 40px -20px rgba(0, 0, 0, .7);
+  }
+}
+
+/* ---------- 2. Basics ---------- */
+* { box-sizing: border-box; }           /* width includes padding: easier layouts */
+html { scroll-behavior: smooth; }       /* menu links glide to their section */
+body {
+  margin: 0;
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; line-height: 1.15; margin: 0; }
+p { margin: 0; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }  /* gold focus ring */
+
+/* .wrap keeps content centred and not too wide on big screens */
+.wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+
+.eyebrow {
+  font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold-text); margin-bottom: 10px;
+}
+
+/* Small line icons (inline SVG) take the text colour */
+svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- 3. Buttons (pill shaped, at least 44px tall for thumbs) ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 24px; border-radius: 999px;
+  font-weight: 800; text-decoration: none; border: 2px solid transparent;
+  transition: transform .15s, background .2s;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: scale(.97); }
+.btn-small { min-height: 44px; padding: 0 18px; font-size: 14px; }
+.btn-gold { background: var(--gold); color: var(--on-gold); }
+.btn-outline { border-color: var(--line); color: var(--text); background: var(--surface); }
+.btn-outline-light { border-color: rgba(255, 255, 255, .7); color: #fff; }
+
+/* Round icon buttons (pause, arrows, close) */
+.round-btn {
+  width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto;
+  display: grid; place-items: center;
+  background: rgba(255, 255, 255, .1); color: #fff; border: 1.5px solid rgba(255, 255, 255, .45);
+}
+
+/* ---------- 4. Header ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 50;   /* stays on screen while scrolling */
+  background: var(--navy); color: #fff;
+}
+.header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: var(--header-height); }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand-mark {
+  width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--gold);
+  display: grid; place-items: center; color: var(--gold); font-family: var(--font-heading);
+}
+.brand-name { font-family: var(--font-heading); font-size: 20px; }
+
+.main-nav { display: flex; align-items: center; gap: 6px; }
+.main-nav a:not(.btn) {
+  color: #D7DBEA; text-decoration: none; font-weight: 600; font-size: 15px;
+  padding: 10px 12px; border-radius: 999px;
+}
+.main-nav a:not(.btn):hover { color: #fff; background: rgba(255, 255, 255, .08); }
+
+.menu-btn {
+  display: none;   /* hidden on big screens, shown on phones below */
+  min-height: 44px; padding: 0 18px; border-radius: 999px;
+  background: none; color: #fff; border: 1.5px solid rgba(255, 255, 255, .5); font-weight: 700;
+}
+
+/* Phones and small tablets: the menu becomes a drop-down */
+@media (max-width: 860px) {
+  .menu-btn { display: block; }
+  .main-nav {
+    display: none;                          /* closed until the Menu button is pressed */
+    position: absolute; left: 0; right: 0; top: var(--header-height);
+    flex-direction: column; align-items: stretch;
+    background: var(--navy); padding: 8px 16px 20px; border-top: 1px solid rgba(255, 255, 255, .12);
+  }
+  .main-nav.is-open { display: flex; }      /* js/home.js adds "is-open" */
+  .main-nav a:not(.btn) { padding: 14px 12px; }
+  .main-nav .btn { margin-top: 8px; }
+}
+
+/* ---------- 5. Hero slideshow ---------- */
+.hero {
+  position: relative; overflow: hidden; color: #fff; background: var(--navy-deep);
+  min-height: min(700px, calc(100svh - var(--header-height)));
+  display: flex; align-items: flex-end;
+}
+/* The photos sit a bit taller than the hero so the slow "parallax" move never shows a gap */
+.hero-slides { position: absolute; inset: -8% 0; will-change: transform; }
+.hero-slides img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity 1.2s ease;     /* photos fade in and out */
+}
+.hero-slides img.is-active { opacity: 1; animation: slow-zoom 8s ease-out forwards; }
+@keyframes slow-zoom { from { transform: scale(1.04); } to { transform: scale(1.14); } }
+
+/* Dark shade over the photo so the white text is easy to read */
+.hero::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10, 16, 38, .2) 0%, rgba(10, 16, 38, .65) 50%, rgba(10, 16, 38, .92) 100%);
+}
+/* On phones the text covers more of the photo, so the shade starts darker */
+@media (max-width: 760px) {
+  .hero::after { background: linear-gradient(180deg, rgba(10, 16, 38, .45) 0%, rgba(10, 16, 38, .75) 45%, rgba(10, 16, 38, .94) 100%); }
+}
+.hero-text { position: relative; z-index: 1; padding-top: 96px; padding-bottom: 28px; display: flex; flex-direction: column; gap: 18px; }
+.hero .eyebrow { color: var(--gold); margin: 0; }
+.hero h1 { font-size: clamp(40px, 6.5vw, 80px); max-width: 14ch; }
+.hero h1 em { font-style: normal; color: var(--gold); }
+.lede { font-size: clamp(16px, 2vw, 19px); max-width: 54ch; color: #DCE0EE; }
+.hero-buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.hero-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .2);
+  font-size: 14px; color: #C9CEE0;
+}
+.slide-controls { display: flex; align-items: center; gap: 12px; }
+.slide-progress { display: flex; gap: 6px; }
+.slide-progress i { width: 24px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .3); overflow: hidden; }
+.slide-progress i::after { content: ""; display: block; height: 100%; background: var(--gold); transform: scaleX(0); transform-origin: left; }
+.slide-progress i.is-done::after { transform: scaleX(1); }
+.slide-progress i.is-active::after { animation: fill-line 6s linear forwards; }
+@keyframes fill-line { to { transform: scaleX(1); } }
+.is-paused .slide-progress i.is-active::after { animation-play-state: paused; }
+/* Show the pause icon while playing, the play icon while paused */
+.icon-play, .is-paused .icon-pause { display: none; }
+.is-paused .icon-play { display: block; }
+
+/* ---------- 6. Sections ---------- */
+.section { padding: 88px 0; scroll-margin-top: var(--header-height); }
+.section h2, .work h2 { font-size: clamp(30px, 4.4vw, 48px); }
+.section-intro { color: var(--muted); max-width: 56ch; margin-top: 12px; }
+.section-tint { background: var(--tint); }
+
+/* What we offer: cards in a grid that wraps on its own */
+.services {
+  list-style: none; padding: 0; margin: 40px 0 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px;
+}
+.services li {
+  background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--gold);
+  border-radius: var(--radius); padding: 24px;
+}
+.services h3 { font-size: 23px; margin-bottom: 8px; }
+.services p { color: var(--muted); }
+
+/* ---------- 7. Our work: sideways gallery ---------- */
+.work { background: var(--navy); color: #fff; scroll-margin-top: var(--header-height); }
+.work .eyebrow { color: var(--gold); }
+.work .section-intro { color: #C9CEE0; }
+.work-pin { padding: 72px 0 56px; overflow: hidden; }
+.work-track {
+  display: flex; gap: 18px; margin-top: 36px;
+  padding: 0 max(16px, calc((100vw - 1180px) / 2 + 16px));   /* lines the first photo up with the heading */
+  will-change: transform;
+}
+.shot {
+  flex: 0 0 auto; width: clamp(240px, 26vw, 340px);
+  padding: 0; border: 0; background: none; color: #fff; text-align: left;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.shot-frame { display: block; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden; background: #1B2A5A; }
+.shot:nth-child(even) .shot-frame { aspect-ratio: 1 / 1; margin-top: 40px; }   /* uneven heights look less like a template */
+.shot img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.shot:hover img { transform: scale(1.06); }
+.shot-caption { font-size: 14px; color: #C9CEE0; }
+.shot-caption b { display: block; color: #fff; font-size: 15px; }
+.work-hint { margin-top: 24px; font-size: 14px; color: #A9B0CB; }
+
+/* PHONE mode (js/home.js adds "is-swipe"): a normal sideways-scrolling row with snap */
+.work.is-swipe .work-track { overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; transform: none !important; scrollbar-width: none; }
+.work.is-swipe .shot { scroll-snap-align: start; width: 78vw; max-width: 320px; }
+/* LAPTOP mode (js/home.js adds "is-pinned"): the gallery sticks while the photos slide */
+.work.is-pinned .work-pin { position: sticky; top: var(--header-height); }
+
+/* How booking works: numbered steps */
+.steps {
+  list-style: none; padding: 0; margin: 40px 0 0; counter-reset: step;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;
+}
+.steps li { border-top: 2px solid var(--gold); padding-top: 16px; counter-increment: step; }
+.steps li::before {
+  content: "Step " counter(step);   /* the browser writes Step 1, Step 2 ... for us */
+  display: block; font-size: 12px; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--gold-text); margin-bottom: 6px;
+}
+.steps h3 { font-family: var(--font-text); font-weight: 800; font-size: 18px; margin-bottom: 6px; }
+.steps p { color: var(--muted); }
+
+/* Contact */
+.contact { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+@media (max-width: 860px) { .contact { grid-template-columns: 1fr; } }
+.contact-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+.contact-card dl { margin: 0 0 20px; }
+.contact-card dt { font-size: 13px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.contact-card dd { margin: 2px 0 14px; font-size: 18px; font-weight: 600; }
+.contact-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ---------- 8. Footer ---------- */
+.site-footer { background: var(--navy-deep); color: #C9CEE0; padding: 40px 0; font-size: 15px; }
+.site-footer strong { color: #fff; }
+.footer-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.copyright { color: #9AA2BF; }
+
+/* ---------- 9. Photo viewer pop-up ---------- */
+.viewer { border: 0; padding: 0; background: transparent; width: min(1000px, 94vw); max-height: 96vh; color: #fff; }
+.viewer::backdrop { background: rgba(6, 10, 26, .92); }   /* dark screen behind the photo */
+.viewer img { width: 100%; max-height: 78vh; object-fit: contain; border-radius: 10px; }
+.viewer-bar { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.viewer-bar p { flex: 1; text-align: center; font-size: 15px; }
+
+/* ---------- 10. Rise-in on scroll ----------
+   js/home.js adds "motion" to <html> ONLY when JavaScript runs and the visitor allows motion.
+   Without that class nothing is hidden, so content can never get stuck invisible. */
+.motion .reveal { opacity: 0; transform: translateY(40px); transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1); }
+.motion .reveal.is-visible { opacity: 1; transform: none; }
+
+/* ---------- 11. Respect people who turn off animations in their device settings ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

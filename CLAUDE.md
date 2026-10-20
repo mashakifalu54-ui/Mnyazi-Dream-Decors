@@ -24,3 +24,16 @@ Brand navy #15224A, gold #C9A227, fonts Marcellus + Manrope. Design files in des
 
 ## Build order
 1 database + seed from for_website_demo.xlsx; 2 price list from DB; 3 quote and total; 4 save booking; 5 admin page (bookings, one booking, items/prices, packages); 6 PDFs (quote, invoice, receipt); 7 reviews; 8 PDF learning book (every file and SQL statement, with a "try this" change per chapter).
+
+## Payments (design for scaling, decided 20 Oct 2026)
+Build payments as a swappable layer so M-Pesa and other methods plug in without touching the booking code.
+- lib/payments/index.js: one function `startPayment(bookingId, method, phone, amount)` that picks a provider.
+- lib/payments/manual.js: the office types amount + M-Pesa code (build this FIRST, it always stays as a fallback).
+- lib/payments/mpesa.js: Safaricom Daraja STK Push (customer gets a PIN prompt on their phone).
+- Later, same shape: lib/payments/card.js (a Kenyan gateway such as Pesapal, Flutterwave or IntaSend; check current fees and terms before choosing), Airtel Money, etc.
+- Every provider exposes `start()` and `handleCallback()`. Nothing outside lib/payments knows which provider was used.
+Payments table: id, booking_id, provider, method, amount, phone, status (initiated/pending/success/failed/cancelled), provider_ref (e.g. CheckoutRequestID), receipt_code (e.g. M-Pesa code), raw_callback (JSON), created_at, confirmed_at. Callback handling must be idempotent (same callback twice = one payment). Booking status moves to deposit_paid / fully_paid only from a successful payment row, never from the browser.
+Browser confirmation: the page calls POST /api/payments (shows "Check your phone and enter your M-Pesa PIN"), then polls GET /api/payments/:id every 2-3 seconds until status is success/failed, then shows the receipt. The browser only displays the result; the provider's callback to the server is the source of truth.
+Daraja facts to respect: needs a Daraja developer account, consumer key and secret, shortcode (Paybill or Till) and passkey, all kept in a .env file that is never committed. The callback URL must be public HTTPS, so on localhost use a tunnel (ngrok or Cloudflare Tunnel) or a "simulate payment" button in development. Start in Daraja's sandbox, then go live with the client's real Paybill/Till. Verify current Daraja details in Safaricom's docs before coding.
+Security: validate amounts server-side from the booking, never from the browser; log every callback; rate-limit payment attempts per phone; HTTPS only when live.
+Build order addition: after step 6 (PDFs), add 6b payments: manual first, then simulated payment with browser polling, then real Daraja sandbox.

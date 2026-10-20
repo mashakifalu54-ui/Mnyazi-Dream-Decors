@@ -20,6 +20,7 @@ Prototype: the office page has a "Send on WhatsApp" button that opens a wa.me ch
 No open comment box. After the office marks a booking "completed", the system makes a private review link to send on WhatsApp. Only that link can submit: 1-5 stars, a comment, optional photo. Reviews start as "pending"; the office approves before it shows on the site (first name + event type + "Verified booking"). Table reviews(id, booking_id UNIQUE, rating 1-5, comment, photo, status pending/approved/hidden, created_at). Also show a "Review us on Google" link.
 
 ## Design
+Read DESIGN-PROMPT.md for the full look, feel, motion and UX rules; it wins over everything else about visuals.
 Brand navy #15224A, gold #C9A227, fonts Marcellus + Manrope. Design files in design-canvas/, interactive front-end in booking-prototype/src.html, Canva link in PROJECT-NOTES.md. Use the original full-size photos and video in the repo.
 
 ## Build order

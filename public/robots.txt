@@ -1,0 +1,9 @@
+# robots.txt: tells Google which pages it may read.
+# Customer pages are open; the office pages and private links are not.
+User-agent: *
+Disallow: /admin/
+Disallow: /status/
+Disallow: /review/
+Disallow: /api/
+# Add this line once the site has its real address:
+# Sitemap: https://YOUR-DOMAIN/sitemap.xml

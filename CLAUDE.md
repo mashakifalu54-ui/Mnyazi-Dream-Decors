@@ -72,3 +72,13 @@ Budget finder ranges, updated to fit these packages: Below 20,000 / 20,000-40,00
 
 ## Hosting (decided 20 Oct 2026)
 Do not use Netlify for this system. Build and test on localhost. When going live: the Node server runs on a host Timothy controls (a VPS or a Node-capable host), behind HTTPS, with daily backups of data/mnyazi.db kept off the server, secrets only in .env, the admin page behind a password, and Node kept updated. Keep the code host-neutral: no host-specific features.
+
+## Privacy, repo and deployment (decided 20 Oct 2026)
+- Customer data never goes to GitHub: data/ (the database) and .env are in .gitignore. Keep it that way; never commit backups or exports of the database.
+- The GitHub repo should be PRIVATE (source code and the client's rate card are business information).
+- The live host does NOT connect to GitHub. Deploy by uploading a release (zip of the code, without data/, node_modules/ or .env) through the host's file manager or SFTP, then `npm install --omit=dev` on the server. The server's .env and data/ are created on the server and stay there.
+- Candidate host: Truehost Kenya (cPanel lists Node.js support, free SSL, daily backups). Confirm with them before buying: running a long-lived Node.js app, Node 22.13+ (node:sqlite), files kept between restarts, SSH access.
+## Google Search and favicon
+- Favicon set is in public/icons + public/favicon.ico + public/site.webmanifest; every new page copies the same <head> icon lines from index.html.
+- public/robots.txt blocks /admin/, /status/, /review/ and /api/ from search. Add the Sitemap line once the real domain is known.
+- Going live checklist for Google: own domain (e.g. mnyazidreamdecor.co.ke), HTTPS, unique <title> and meta description per page, sitemap.xml, verify the site in Google Search Console and submit the sitemap, link the site from the Google Business Profile, LocalBusiness schema on the homepage. Private pages (status, review, admin) get <meta name="robots" content="noindex">.

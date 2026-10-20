@@ -51,3 +51,6 @@ Package contents and prices; stock counts; deposit %; M-Pesa Paybill/Till; trans
 - Keep data in the database, not in the code. One job per file. Reuse functions.
 - Commit after each working step.
 - Original full-size photos/video are in the repo (the first photos were only 163 px wide).
+
+## Documents and reviews (decided 20 Oct 2026)
+See CLAUDE.md for the quote, invoice, receipt flow, WhatsApp sending and the reviews design.

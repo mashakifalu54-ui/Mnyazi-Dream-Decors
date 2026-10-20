@@ -21,6 +21,8 @@ Premium coastal event house. Calm, confident, warm. A bride's mother on a phone 
 ## Experience rules
 - Mobile first. Design at 390px wide, then enlarge. Thumb-reachable controls, 44px minimum touch targets, quote button always visible (floating button on phones, sticky summary on desktop).
 - Price clarity: every item shows "unit price x quantity = line total"; the running total and the 50% deposit are always visible; nothing is hidden until checkout.
+- Budget finder first: event type, guests, budget (one-tap KES range chips or an exact amount), area, then "Show what fits". Budget bar in the quote drawer. Everything optional.
+- Always-visible contact: floating WhatsApp and Call buttons on every customer page (bottom right, clear of the quote button). On phones, consider a bottom bar: Home, Build, Packages, Quote, Call.
 - Flow: choose items or a package -> quote drawer -> event details -> sent. Four steps, a visible step indicator, back never loses data.
 - Custom item request is a normal part of the page, not an error state: "price pending" shown in a gold-tinted row, with a promise of a reply from the office.
 - Forms: only ask what the office needs (name, Kenyan phone, event, date, area, notes). Validate Kenyan numbers (07xx, 01xx, +254) and future dates, with plain-language errors next to the field. No email required.

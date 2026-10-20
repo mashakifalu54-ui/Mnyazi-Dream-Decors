@@ -48,3 +48,12 @@ A daily check (a small script or a button "Who needs a message today?") builds t
 Generate one page per search intent from a data file (data/seo-pages.json), not by hand: e.g. "Tent hire in Kilifi", "Wedding décor in Malindi", "Ruracio / dowry décor in Kilifi", "Chiavari chair hire Kilifi", "Photobooth hire Kilifi", "Birthday party décor Mtwapa", "Stage and PA system hire". Each page needs: unique title and meta description, a real heading and 150+ words of useful text (what is included, price from the list, area served), real photos with alt text, the price list items that match, a "Build my quote" button, and LocalBusiness + FAQ schema markup. Also a generated sitemap.xml and robots.txt, and submit the sitemap in Google Search Console. Never copy the same text across pages with only the town name swapped; write each page's intro differently. Prices on these pages must come from the database so they never go stale.
 Also: Google Business profile (fix the pin, add photos, link to the site) and a "Review us on Google" link.
 Build order additions: 9 WhatsApp message queue; 10 local search pages.
+
+## Budget finder (decided 20 Oct 2026; build right after step 3, quote and total)
+Inspired by True Safari Adventure's "Search Packages" form (dropdowns for budget, nights, theme + Search). Our version, at the top of "Build your event" and on the home page:
+- Fields: Event type (Wedding, Ruracio/Dowry, Birthday, Graduation, Funeral, Corporate, Other); Guests (number); Budget (tap a range or type an exact amount); Area (Kilifi town, Mnarani, Malindi, Watamu, Mtwapa, Mombasa, Other). Button: "Show what fits".
+- Budget ranges in KES, as one-tap chips (not a dropdown; faster on phones): Below 30,000 / 30,000-50,000 / 50,000-100,000 / 100,000-200,000 / 200,000-300,000 / Above 300,000. Ranges live in the database settings, not in code.
+- Result: packages that fit, best fit first, each showing "uses KES X of your budget". Packages slightly over stay visible, marked "KES X over" with a suggestion of what to remove. Packages scale with guests (seats, tables and tents per guest count come from package rules, not fixed numbers).
+- Quote drawer budget bar: "KES 62,000 of 80,000 used, 18,000 left"; gold near the limit, warning when over (customer may still go over). "Often added" suggests items that fit the money left.
+- The booking stores budget_min, budget_max (or exact budget), guests and event type; the admin booking page shows the budget beside the quote total.
+- Every field is optional: a customer can skip straight to choosing items.

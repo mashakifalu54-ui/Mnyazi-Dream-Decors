@@ -69,3 +69,6 @@ Packages have a fixed price plus an "includes" list of text lines (not item rows
 Event types (from the card): Malozi/Kuhaswa, Wedding, Church, Baby Shower, Birthday, Graduation, Farewell, Corporate.
 Price conflicts to ask the office about: tents (card: 50-seater 2,500, 100-seater 3,500; spreadsheet: 80-seater 3,000, 100-seater draped canopy 3,500) and chairs (card: 20 per white armless chair; spreadsheet: dressed plastic 100, chiavari 250).
 Budget finder ranges, updated to fit these packages: Below 20,000 / 20,000-40,000 / 40,000-60,000 / 60,000-80,000 / 80,000-100,000 / Above 100,000 (plus tents and chairs).
+
+## Hosting (decided 20 Oct 2026)
+Do not use Netlify for this system. Build and test on localhost. When going live: the Node server runs on a host Timothy controls (a VPS or a Node-capable host), behind HTTPS, with daily backups of data/mnyazi.db kept off the server, secrets only in .env, the admin page behind a password, and Node kept updated. Keep the code host-neutral: no host-specific features.

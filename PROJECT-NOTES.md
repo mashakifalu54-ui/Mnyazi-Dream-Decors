@@ -8,7 +8,7 @@ Status: UI/UX design done, interactive front-end prototype done, back end not st
 - Along St Thomas – Prison Road, Kilifi
 - Phone / WhatsApp: 0793 463 223 (254793463223)
 - Brand: navy #15224A, gold #C9A227. Fonts: Marcellus (headings), Manrope (text)
-- Preview site: https://mnyazi-dream-decor.netlify.app
+- Old free preview site (Netlify, not the real system): https://mnyazi-dream-decor.netlify.app
 
 ## What the system must do
 1. Customers pick items. Unit price x quantity = line total. Running total.
@@ -26,7 +26,7 @@ Status: UI/UX design done, interactive front-end prototype done, back end not st
 - Inspiration: SimplyBook.me case study of The Table Service (custom pages, categories, add-ons, intake forms, deposits, notifications).
 
 ## Tech stack
-HTML + CSS + plain JavaScript (no Tailwind, no framework) / Node.js + Express / SQLite / PDFKit for PDF quotes / password + session cookie for admin / photos in a folder. Later: Supabase or Neon + Netlify.
+HTML + CSS + plain JavaScript (no Tailwind, no framework) / Node.js + Express / SQLite / PDFKit for PDF quotes / password + session cookie for admin / photos in a folder. Hosting decided 20 Oct 2026: NOT Netlify. When going live, host the Node server on a server Timothy controls (a VPS, or a Node-capable host), with HTTPS, daily database backups and secrets in .env. Choose the host before step 6b (M-Pesa needs a public HTTPS address).
 
 ## Build order (one layer at a time, run and test each)
 1. Database: db/schema.sql (items, categories, packages, package_items, bookings, booking_lines, custom_requests, payments), db/seed.sql from the price list

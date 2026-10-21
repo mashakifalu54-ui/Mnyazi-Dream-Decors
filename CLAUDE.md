@@ -82,3 +82,10 @@ Do not use Netlify for this system. Build and test on localhost. When going live
 - Favicon set is in public/icons + public/favicon.ico + public/site.webmanifest; every new page copies the same <head> icon lines from index.html.
 - public/robots.txt blocks /admin/, /status/, /review/ and /api/ from search. Add the Sitemap line once the real domain is known.
 - Going live checklist for Google: own domain (e.g. mnyazidreamdecor.co.ke), HTTPS, unique <title> and meta description per page, sitemap.xml, verify the site in Google Search Console and submit the sitemap, link the site from the Google Business Profile, LocalBusiness schema on the homepage. Private pages (status, review, admin) get <meta name="robots" content="noindex">.
+
+## Ready for PostgreSQL later (decided 21 Oct 2026)
+SQLite now; PostgreSQL later as a learning step (local Postgres first, then a hosted one such as Neon or Supabase). To keep that switch small:
+- All SQL lives in db/ query files (e.g. db/items.js, db/bookings.js) that export plain functions like getVisibleItems() or createBooking(). Routes never contain SQL.
+- Only db/connection.js knows which database is used.
+- Write standard SQL: avoid SQLite-only features where a standard one exists. Note the known differences in comments: datetime('now') vs now(), INTEGER PRIMARY KEY vs GENERATED ALWAYS AS IDENTITY, ? vs $1 placeholders, synchronous node:sqlite vs async pg (await).
+- Money stays in whole shillings (INTEGER), dates as 'YYYY-MM-DD' text now (DATE in Postgres).

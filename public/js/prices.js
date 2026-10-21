@@ -3,17 +3,8 @@
   1. Ask the server for the packages and the price list (fetch)
   2. Packages: one tab per group (White Wedding, Church, Malozi / Kuhaswa), cards underneath
   3. Price list: one table per category, with jump links at the top
-  Uses kes() from common.js.
+  Uses kes() and escapeHtml() from common.js.
 */
-
-// Safety: text from the database is put into the page as TEXT, never as HTML code.
-// escapeHtml turns < > & " into harmless symbols, so a name like "<script>" can't run.
-function escapeHtml(text) {
-  return String(text).replace(/[&<>"]/g, function (c) {
-    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-  });
-}
-
 
 // ---------- 1. Ask the server ----------
 // fetch() asks the server for an address and WAITS for the answer (that is what "await" means).

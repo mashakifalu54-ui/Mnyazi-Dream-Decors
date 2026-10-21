@@ -1,0 +1,298 @@
+/*
+  build.css: extra look for the Build your event page ONLY (build.html).
+  Loaded after site.css and prices.css (it reuses their chips, package cards and buttons).
+
+  Written MOBILE FIRST (DESIGN-PROMPT.md): the normal rules are for a 390px phone;
+  the @media (min-width: ...) blocks at the bottom add the laptop layout.
+*/
+
+/* ---------- Buttons this page needs ---------- */
+button.btn { font: inherit; font-weight: 800; cursor: pointer; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-navy { background: var(--navy); color: #fff; }
+
+/* ---------- Layout: one column on phones ---------- */
+.builder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);   /* minmax(0, ...) stops long words from stretching the page */
+  gap: 32px;
+  padding-top: 40px;
+  padding-bottom: 120px;                    /* room for the quote bar at the bottom */
+}
+.build-block { margin-bottom: 48px; }
+.build-block h2 { font-size: clamp(28px, 4vw, 40px); }
+
+/* ---------- Item cards ---------- */
+.item-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+.item-card {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.item-card.is-chosen { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+
+/* No item photos yet: a navy tile with the item's first letters in gold */
+.item-tile {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--navy);
+  color: var(--gold);
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+.item-card h3 {
+  font-family: var(--font-text);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.item-desc { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.item-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+.item-price { font-weight: 800; font-variant-numeric: tabular-nums; }
+.item-price small { font-weight: 600; color: var(--muted); }
+.line-total { grid-column: 2; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.line-total b { color: var(--text); }
+
+/* The small "Add" button and the − 3 + stepper */
+.add-btn {
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--navy);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.stepper button {
+  width: 44px;
+  height: 100%;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.stepper input {
+  width: 52px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  text-align: center;
+  font: inherit;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+.stepper input::-webkit-inner-spin-button,
+.stepper input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Package cards on this page get a button at the bottom */
+.package-card { display: flex; flex-direction: column; }
+.package-card ul { flex: 1; }
+.package-card .btn { margin-top: 18px; }
+.package-card.is-chosen { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+
+/* ---------- Custom request: gold dashed box ---------- */
+.custom-request {
+  background: var(--surface);
+  border: 1.5px dashed var(--gold);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.custom-request h2 { font-size: 26px; }
+.custom-request p { color: var(--muted); margin: 6px 0 14px; }
+.custom-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.field input {
+  height: 48px;
+  padding: 0 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+}
+.field-error { color: #b3261e; font-weight: 700; margin: 0 0 12px; }
+
+/* ---------- Your quote (summary) ---------- */
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.summary h2 { font-size: 28px; }
+.summary-lines { display: flex; flex-direction: column; gap: 8px; font-size: 15px; }
+.summary-line { display: flex; justify-content: space-between; gap: 12px; }
+.summary-line span:first-child { min-width: 0; }
+.summary-line span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pending { color: var(--gold-text); font-weight: 800; }
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 2px solid var(--text);
+  padding-top: 12px;
+}
+.summary-total b { font-size: 26px; font-variant-numeric: tabular-nums; }
+.summary-deposit { display: flex; justify-content: space-between; gap: 12px; color: var(--gold-text); font-weight: 700; font-size: 15px; }
+.summary-deposit b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.summary-note { font-size: 14px; color: var(--muted); }
+.empty-note { color: var(--muted); font-size: 15px; }
+
+/* ---------- Quote bar: fixed at the bottom on phones ---------- */
+.quote-bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 60px;
+  padding: 8px 8px 8px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--navy);
+  color: #fff;
+  box-shadow: var(--shadow);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.quote-bar b { display: block; font-size: 13px; color: #c9cee0; font-weight: 600; }
+.quote-bar span span { font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; }
+.quote-bar-cta {
+  background: var(--gold);
+  color: var(--on-gold);
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-weight: 800;
+}
+.quote-bar.bump { animation: bump 0.45s ease; }
+@keyframes bump { 40% { transform: scale(1.04); } }
+
+/* The WhatsApp / Call buttons move up so the quote bar never covers them */
+.has-quote-bar .quick-contact { bottom: 88px; }
+
+/* ---------- Review pop-up ---------- */
+.review {
+  width: min(520px, 100% - 24px);
+  max-height: calc(100vh - 24px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+.review::backdrop { background: rgba(6, 10, 26, 0.6); }
+.review[open] { display: flex; flex-direction: column; }
+.review-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.review-head h2 { font-size: 26px; }
+.review-head .round-btn { background: var(--bg); color: var(--text); border-color: var(--line); }
+.review-steps {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 12px 20px 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.review-steps li { flex: 1; border-top: 3px solid var(--line); padding-top: 6px; }
+.review-steps li.is-current { border-color: var(--gold); color: var(--text); }
+.review-body { overflow: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.review-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.review-line .name { font-weight: 700; }
+.review-line .meta { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.review-line .amount { font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+.review-line.is-custom { background: var(--tint); border: 0; border-radius: 10px; padding: 10px 12px; }
+.review-foot { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--line); }
+.review-foot .btn { flex: 1 1 auto; }
+
+/* ---------- Bigger screens ---------- */
+@media (min-width: 640px) {
+  .item-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1000px) {
+  /* Two columns: choices on the left, the quote stays in view on the right */
+  .builder { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; padding-bottom: 80px; }
+  .summary { position: sticky; top: calc(var(--header-height) + 20px); }
+  .quote-bar { display: none; }
+  .has-quote-bar .quick-contact { bottom: 16px; }
+  /* Round icon-only contact buttons here, so they sit in the page margin instead of over the quote box */
+  .has-quote-bar .quick-btn { width: 52px; padding: 0; justify-content: center; }
+  .has-quote-bar .quick-btn span { display: none; }
+}
+
+/* Phones and tablets: the summary sits at the end of the page, the quote bar does the job on screen */
+@media (max-width: 999px) {
+  .summary { order: 2; }
+}
+
+/* "Remove" in the review: looks like a link, still a real button */
+.link-btn {
+  justify-self: start;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #b3261e;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+@media (prefers-color-scheme: dark) { .link-btn { color: #ff8a80; } }

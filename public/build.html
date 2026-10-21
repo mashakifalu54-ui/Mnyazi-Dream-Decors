@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<!--
+  BUILD YOUR EVENT page (build step 3: quote and total).
+  The customer picks items and packages; the total and the deposit update as they go.
+  - Prices come from the server (/api/items, /api/packages), never typed here.
+  - The maths is in js/quote-math.js: the SAME file the server uses.
+  - "Review quote" asks the server to price the quote (/api/quote), so what the
+    customer sees in the review is exactly what will be saved in step 4.
+  Header, footer and contact buttons are copied from prices.html.
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <!-- Makes the page fit phone screens instead of showing a tiny desktop page -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Tells the browser this page has both a light and a dark design -->
+  <meta name="color-scheme" content="light dark">
+  <title>Build your event | Mnyazi Dream Decor, Kilifi</title>
+  <meta name="description"
+    content="Choose tents, seating, tables, décor and packages, and see your event price add up as you go. Mnyazi Dream Decor, Kilifi.">
+
+  <!-- Tab icon (favicon): the gold "M" on navy. Browsers pick the format they support. -->
+  <link rel="icon" href="favicon.ico" sizes="32x32">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#15224A">
+
+  <!-- Brand fonts from Google Fonts: Marcellus for headings, Manrope for text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Marcellus&family=Manrope:wght@400;600;700;800&display=swap">
+
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="stylesheet" href="css/prices.css">
+  <link rel="stylesheet" href="css/build.css">
+</head>
+
+<body class="has-quote-bar">
+
+  <!-- ===================== HEADER (stays at the top) ===================== -->
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-name">Mnyazi Dream Decor</span>
+      </a>
+
+      <!-- On phones this button shows/hides the menu (see js/home.js) -->
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mainNav">Menu</button>
+
+      <nav class="main-nav" id="mainNav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="build.html" aria-current="page">Build your event</a>
+        <a href="prices.html">Prices &amp; packages</a>
+        <a href="index.html#contact">Contact</a>
+        <a class="btn btn-gold btn-small"
+          href="https://wa.me/254793463223?text=Hello%20Mnyazi%20Dream%20Decor%2C%20I%20would%20like%20a%20quote%20for%20my%20event."
+          target="_blank" rel="noopener">Get a quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- ===================== PAGE TITLE ===================== -->
+    <section class="page-head">
+      <div class="wrap">
+        <p class="eyebrow">Build your event</p>
+        <h1>Choose what you need, see the price as you go</h1>
+        <p class="section-intro">Unit price × how many = line total. Nothing is booked until the office confirms your date.</p>
+      </div>
+    </section>
+
+    <div class="wrap builder">
+
+      <!-- ===================== LEFT: CHOICES ===================== -->
+      <div class="builder-main">
+
+        <!-- Packages -->
+        <section class="build-block" id="packages" aria-labelledby="packagesTitle">
+          <h2 id="packagesTitle">Start from a package</h2>
+          <p class="section-intro">A ready décor set at one price. Tents and chairs are not included: add them from the list below.</p>
+          <div class="chips" id="packageTabs" role="tablist" aria-label="Package type"></div>
+          <div class="package-grid" id="packageGrid"><p class="loading">Loading packages…</p></div>
+        </section>
+
+        <!-- Price-list items -->
+        <section class="build-block" id="items" aria-labelledby="itemsTitle">
+          <h2 id="itemsTitle">Or pick single items</h2>
+          <div class="chips" id="categoryChips" aria-label="Show a category"></div>
+          <div class="item-grid" id="itemGrid"><p class="loading">Loading prices…</p></div>
+        </section>
+
+        <!-- Custom request: a normal part of the page, not an error (DESIGN-PROMPT.md) -->
+        <section class="build-block">
+          <form class="custom-request" id="customForm" novalidate>
+            <h2>Can't find something?</h2>
+            <p>Ask for it here. It goes on your quote as "price pending" and the office replies with a price.</p>
+            <div class="custom-fields">
+              <label class="field">Item you need
+                <input id="customName" maxlength="120" placeholder="e.g. Gold charger plates" autocomplete="off">
+              </label>
+              <label class="field field-qty">How many
+                <input id="customQty" type="number" min="1" max="9999" value="1" inputmode="numeric">
+              </label>
+            </div>
+            <p class="field-error" id="customError" role="alert" hidden></p>
+            <button class="btn btn-navy" type="submit">Add request</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- ===================== RIGHT: YOUR QUOTE (sticky on laptops) ===================== -->
+      <aside class="summary" id="summary" aria-labelledby="summaryTitle">
+        <p class="eyebrow">Your quote</p>
+        <h2 id="summaryTitle">So far</h2>
+        <div class="summary-lines" id="summaryLines"></div>
+        <div class="summary-total"><span>Total</span><b id="summaryTotal">KES 0</b></div>
+        <div class="summary-deposit"><span>Deposit to hold the date (<span class="deposit-percent">50</span>%)</span><b id="summaryDeposit">KES 0</b></div>
+        <p class="summary-note" id="summaryNote" hidden></p>
+        <button class="btn btn-gold" type="button" data-open-review>Review quote</button>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <p><strong>Mnyazi Dream Decor</strong><br>Event tents, décor, stages and sound on the Kenyan coast.</p>
+      <p>Along St Thomas – Prison Road, Kilifi<br><a href="tel:+254793463223">0793 463 223</a> ·
+        <a href="https://wa.me/254793463223" target="_blank" rel="noopener">WhatsApp</a>
+      </p>
+      <!-- The year is filled in by js/home.js so it never goes out of date -->
+      <p class="copyright">© <span id="year">2026</span> Mnyazi Dream Decor</p>
+    </div>
+  </footer>
+
+  <!-- ===================== ALWAYS-VISIBLE CONTACT BUTTONS ===================== -->
+  <!-- Float at the bottom right on every customer page (DESIGN-PROMPT.md).
+       On the booking page the quote button will sit above them. -->
+  <div class="quick-contact" aria-label="Contact us">
+    <a class="quick-btn quick-whatsapp"
+      href="https://wa.me/254793463223?text=Hello%20Mnyazi%20Dream%20Decor%2C%20I%20would%20like%20a%20quote%20for%20my%20event."
+      target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5z" />
+      </svg>
+      <span>WhatsApp</span>
+    </a>
+    <a class="quick-btn quick-call" href="tel:+254793463223" aria-label="Call 0793 463 223">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z" />
+      </svg>
+      <span>Call</span>
+    </a>
+  </div>
+
+  <!-- ===================== ALWAYS-VISIBLE CONTACT BUTTONS ===================== -->
+  <!-- Float at the bottom right on every customer page (DESIGN-PROMPT.md).
+       On the booking page the quote button will sit above them. -->
+  <div class="quick-contact" aria-label="Contact us">
+    <a class="quick-btn quick-whatsapp"
+      href="https://wa.me/254793463223?text=Hello%20Mnyazi%20Dream%20Decor%2C%20I%20would%20like%20a%20quote%20for%20my%20event."
+      target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5z" />
+      </svg>
+      <span>WhatsApp</span>
+    </a>
+    <a class="quick-btn quick-call" href="tel:+254793463223" aria-label="Call 0793 463 223">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z" />
+      </svg>
+      <span>Call</span>
+    </a>
+  </div>
+
+  <!-- ===================== PHOTO VIEWER (hidden until a photo is tapped) ===================== -->
+  <!-- <dialog> is a built-in HTML pop-up. It closes with the Esc key by itself. -->
+  <dialog class="viewer" id="viewer" aria-label="Photo viewer">
+    <img id="viewerImg" src="" alt="">
+    <div class="viewer-bar">
+      <button class="round-btn" type="button" id="viewerPrev" aria-label="Previous photo">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 5l-7 7 7 7" />
+        </svg>
+      </button>
+      <p id="viewerCaption"></p>
+      <button class="round-btn" type="button" id="viewerNext" aria-label="Next photo">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+      <button class="round-btn" type="button" id="viewerClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+  </dialog>
+
+  <!-- ===================== QUOTE BAR (phones only; always visible) ===================== -->
+  <button class="quote-bar" type="button" data-open-review aria-label="Review your quote">
+    <span><b id="barCount">0 items</b><span id="barTotal">KES 0</span></span>
+    <span class="quote-bar-cta">Review</span>
+  </button>
+
+  <!-- ===================== REVIEW (pop-up, priced by the server) ===================== -->
+  <dialog class="review" id="review" aria-labelledby="reviewTitle">
+    <div class="review-head">
+      <h2 id="reviewTitle">Your quote</h2>
+      <button class="round-btn" type="button" id="reviewClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </div>
+    <ol class="review-steps" aria-label="Steps">
+      <li class="is-current">Items</li><li>Details</li><li>Sent</li>
+    </ol>
+    <div class="review-body" id="reviewBody"></div>
+    <div class="review-foot">
+      <button class="btn btn-outline" type="button" id="reviewBack">Add more items</button>
+      <!-- Step 4 (save the booking) will switch this button on -->
+      <button class="btn btn-gold" type="button" disabled title="Coming in the next build step">Continue to event details</button>
+    </div>
+  </dialog>
+
+  <script src="js/common.js"></script>
+  <script src="js/quote-math.js"></script>
+  <script src="js/build.js"></script>
+</body>
+
+</html>

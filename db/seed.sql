@@ -21,7 +21,10 @@ INSERT INTO settings (key, value) VALUES
   ('whatsapp',         '254793463223'),
   ('booking_prefix',   'MDD'),      -- booking numbers look like MDD-2026-0001
   ('deposit_percent',  '50'),       -- still to be confirmed by the client
-  ('quote_valid_days', '14');
+  ('quote_valid_days', '14'),
+  -- The version of the table design. server.js compares it with the number it expects,
+  -- so an old database is spotted straight away. Raise both when schema.sql changes.
+  ('schema_version',   '3');
 
 
 -- ---------- Budget ranges (the one-tap chips in the budget finder) ----------

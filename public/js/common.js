@@ -3,6 +3,7 @@
   1. Phone menu (open / close)
   2. Footer year
   3. kes(): writes a number as Kenyan money, e.g. 3000 -> "KES 3,000"
+  4. escapeHtml(): makes text from the database safe to put into the page
 */
 
 // ---------- 1. Phone menu ----------
@@ -33,4 +34,14 @@ document.getElementById('year').textContent = new Date().getFullYear();
 // 'en-KE' = Kenyan English style: commas between thousands
 function kes(amount) {
   return 'KES ' + amount.toLocaleString('en-KE');
+}
+
+
+// ---------- 4. Safe text ----------
+// Text from the database is put into the page as TEXT, never as HTML code.
+// escapeHtml turns < > & " into harmless symbols, so a name like "<script>" can't run.
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
 }

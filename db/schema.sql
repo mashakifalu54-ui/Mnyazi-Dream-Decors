@@ -151,29 +151,35 @@ CREATE TABLE bookings (
 
 
 -- ---------------------------------------------------------------------
--- 6. BOOKING LINES: the items inside one booking (one row per line).
---    A line is EITHER an item from the price list (item_id)
---    OR a custom request the customer typed (custom_name).
+-- 6. BOOKING LINES: what is inside one booking (one row per line).
+--    A line is ONE of three kinds:
+--      * an item from the price list   -> item_id is filled in
+--      * a package from the rate card  -> package_id is filled in (qty is 1)
+--      * a custom request              -> custom_name is filled in
 -- ---------------------------------------------------------------------
 CREATE TABLE booking_lines (
-  id          INTEGER PRIMARY KEY,
+  id          INTEGER PRIMARY KEY,              -- Postgres: GENERATED ALWAYS AS IDENTITY
   booking_id  INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
-  item_id     INTEGER REFERENCES items(id),   -- empty for a custom request
-  custom_name TEXT,                            -- empty for a price-list item
+  item_id     INTEGER REFERENCES items(id),
+  package_id  INTEGER REFERENCES packages(id),
+  custom_name TEXT,
   qty         INTEGER NOT NULL CHECK (qty > 0),
   -- The price is COPIED onto the line when the booking is made, so that
   -- changing the price list later never changes an old quote.
   -- Empty (NULL) = custom item still waiting for the office to price it.
   unit_price  INTEGER CHECK (unit_price >= 0),
-  -- line_total is never typed in: SQLite works it out from qty x unit_price.
+  -- line_total is never typed in: the database works it out from qty x unit_price.
   -- If unit_price is empty, line_total is empty too ("price pending").
-  line_total  INTEGER GENERATED ALWAYS AS (qty * unit_price) STORED,
+  line_total  INTEGER GENERATED ALWAYS AS (qty * unit_price) STORED,   -- same words work in Postgres
   status      TEXT NOT NULL DEFAULT 'ok' CHECK (status IN (
                 'ok',            -- normal line
                 'pending',       -- custom item, waiting for a price
                 'unavailable')), -- office can't supply it on that date
-  -- Rule: exactly one of item_id / custom_name must be filled in
-  CHECK ((item_id IS NOT NULL AND custom_name IS NULL) OR (item_id IS NULL AND custom_name IS NOT NULL))
+  -- Rule: exactly ONE of item_id / package_id / custom_name is filled in.
+  -- (x IS NOT NULL) is 1 when filled, 0 when empty, so the three must add up to 1.
+  CHECK ((item_id IS NOT NULL) + (package_id IS NOT NULL) + (custom_name IS NOT NULL) = 1)
+  -- Postgres note: there, true + true doesn't work; write
+  -- num_nonnulls(item_id, package_id, custom_name) = 1 instead.
 );
 
 

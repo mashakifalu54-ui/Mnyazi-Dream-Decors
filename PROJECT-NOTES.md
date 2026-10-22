@@ -84,4 +84,5 @@ What we studied and what to borrow. Earlier ones are already above: SimplyBook.m
 - Our edge to keep: real quotes, packages, payments, PDFs, reminders, data on a server we control.
 
 ### Suggested order if we ever build them
-1 guest-count resizing with "what changed" note; 2 planner-style steps on the Build page (starting point first); 3 delivery areas with exact/estimate fees; 4 Save & share code; 5 "Ask us to call me" option; 6 rename status page to Track my booking; 7 Concerns page.
+(Item 1 was already built before the ideas were parked, and Timothy chose to keep it: items.per_guests + the "How many guests?" box on the Build page. The rule lives on items, not on package_items, which the rate-card packages replaced.)
+1 guest-count resizing (DONE, kept) with "what changed" note; 2 planner-style steps on the Build page (starting point first); 3 delivery areas with exact/estimate fees; 4 Save & share code; 5 "Ask us to call me" option; 6 rename status page to Track my booking; 7 Concerns page.

@@ -50,7 +50,7 @@ function showBookings(bookings) {
           + '<td data-label="Booking"><a href="/admin/booking.html?id=' + b.id + '"><b>' + escapeHtml(b.bookingNo) + '</b></a></td>'
           + '<td data-label="Client">' + escapeHtml(b.customerName) + '<small>' + prettyKenyanPhone(b.phone) + '</small></td>'
           + '<td data-label="Event date">' + shortDate(b.eventDate) + '<small>' + escapeHtml(b.eventType) + (b.area ? ' · ' + escapeHtml(b.area) : '') + '</small></td>'
-          + '<td data-label="Items">' + items + '</td>'
+          + '<td data-label="Items">' + items + (b.source === 'office' ? '<small>booked by the office</small>' : '') + '</td>'
           + '<td data-label="Total" class="num">' + b.total.toLocaleString('en-KE') + (b.pendingCount ? '<small>+ price pending</small>' : '') + '</td>'
           + '<td data-label="Status">' + statusChip(b.status) + '</td>'
           + '</tr>';

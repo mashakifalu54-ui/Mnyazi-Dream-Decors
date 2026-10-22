@@ -263,3 +263,32 @@ button.btn-small { min-height: 44px; padding: 0 18px; font-size: 14px; }
   width: 100%; height: 44px; padding: 0 10px; border: 1.5px solid var(--line); border-radius: 10px;
   background: var(--bg); color: var(--text); font: inherit;
 }
+
+/* ---------- New booking page ---------- */
+.new-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.new-fields .full { grid-column: 1 / -1; }
+.new-fields input, .new-fields select, .new-fields textarea,
+#newBookingForm .status-card > .field input, #newBookingForm .status-card > .field select, .custom-add input {
+  width: 100%; min-width: 0; height: 44px; padding: 0 10px; border: 1.5px solid var(--line); border-radius: 10px;
+  background: var(--bg); color: var(--text); font: inherit;
+}
+.new-fields textarea { height: auto; padding: 10px; resize: vertical; }
+.pick-results { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.pick-results li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.pick-results small { color: var(--muted); }
+.custom-add { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: end; border-top: 1px dashed var(--gold); padding-top: 12px; }
+.custom-add .grow { grid-column: 1 / -1; }
+.chosen-title { font-size: 20px; margin-top: 6px; }
+.chosen-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.chosen-list li { display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.chosen-list input { width: 70px; height: 40px; padding: 0 8px; border: 1.5px solid var(--gold); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; font-weight: 700; }
+.chosen-list .qty-fixed { text-align: center; font-weight: 700; }
+.chosen-name { display: flex; flex-direction: column; font-weight: 600; }
+.chosen-name small { color: var(--muted); font-weight: 400; }
+#newBookingForm .check { align-items: flex-start; }
+
+@media (min-width: 640px) {
+  .new-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .custom-add { grid-template-columns: minmax(0, 2fr) 90px 120px auto; }
+  .custom-add .grow { grid-column: auto; }
+}

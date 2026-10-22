@@ -33,7 +33,7 @@ if (!fs.existsSync(DB_FILE)) {
 // Old database from an earlier build step: the tables changed, so stop with a clear message.
 // (We never delete it automatically: one day it will hold real bookings.)
 // db/seed.sql saves 'schema_version' in the settings table. Raise BOTH numbers when schema.sql changes.
-const SCHEMA_VERSION = '5';
+const SCHEMA_VERSION = '6';
 const { getSetting } = require('./lib/settings');
 let databaseVersion = null;
 try {

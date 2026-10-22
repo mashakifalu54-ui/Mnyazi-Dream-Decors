@@ -45,4 +45,5 @@ Testing without touching your real database: set `MNYAZI_DB` to another file fir
 5. Admin page for the office: booking requests and one booking done (login, prices for custom items, stock on the date, transport, discount, confirm and send on WhatsApp, decline, cancel)
 5b. Admin: edit items, prices, packages and settings: done (/admin/catalogue.html)
 6. PDFs: quote and invoice done (made from the booking each time; customer and office can download)
-6b. Payments: manual (office) and simulated M-Pesa with a Pay button and receipts done; real M-Pesa (Daraja sandbox) next
+6b. Payments: manual (office) and simulated M-Pesa with a Pay button and receipts done; real M-Pesa paused (it will use Mnyazi's own Paybill and Daraja account)
+5c. Office makes bookings for clients (phone, WhatsApp, walk-in) and confirms them: done (/admin/new-booking.html)

@@ -26,7 +26,7 @@ INSERT INTO settings (key, value) VALUES
   ('balance_due_days', ''),       -- balance due this many days before the event; empty = "before set-up day"
   -- The version of the table design. server.js compares it with the number it expects,
   -- so an old database is spotted straight away. Raise both when schema.sql changes.
-  ('schema_version',   '5');
+  ('schema_version',   '6');
 
 
 -- ---------- Budget ranges (the one-tap chips in the budget finder) ----------

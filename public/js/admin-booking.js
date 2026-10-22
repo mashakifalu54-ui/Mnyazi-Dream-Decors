@@ -45,7 +45,7 @@ function showBooking() {
   page.innerHTML = ''
     // Title row
     + '<div class="admin-title"><h1>' + escapeHtml(b.bookingNo) + '</h1>' + statusChip(b.status) + '</div>'
-    + '<p class="summary-note">Received ' + escapeHtml(b.receivedAt) + '</p>'
+    + '<p class="summary-note">' + (b.source === 'office' ? 'Booked by the office' : 'Sent from the website') + ' · ' + escapeHtml(b.receivedAt) + '</p>'
 
     + '<div class="booking-grid">'
 
@@ -203,7 +203,8 @@ function actionsHtml() {
     + '</div>');
 
   // WhatsApp the client at any time, with the private status link
-  parts.push('<a class="btn btn-outline" href="' + whatsAppLink(false) + '" target="_blank" rel="noopener">Send on WhatsApp</a>');
+  // While waiting for the deposit, the message is the quote (total, deposit, link); otherwise a short note with the link
+  parts.push('<a class="btn btn-outline" href="' + whatsAppLink(s === 'quoted') + '" target="_blank" rel="noopener">Send on WhatsApp' + (s === 'quoted' ? ' (quote)' : '') + '</a>');
 
   if (s === 'new' || s === 'needs_price') {
     parts.push('<details class="danger"><summary>Decline this request</summary>'
@@ -332,4 +333,12 @@ function flash(message) {
   flash.timer = setTimeout(() => toast.classList.remove('is-on'), 2500);
 }
 
-startAdminPage(loadBooking);
+// Just made on the New booking page? Say so (and show any warning from the server)
+startAdminPage(async function () {
+  await loadBooking();
+  const params = new URLSearchParams(location.search);
+  if (params.get('created')) {
+    flash(params.get('warning') || 'Booking saved.');
+    history.replaceState(null, '', '/admin/booking.html?id=' + bookingId);   // so a refresh doesn't show it again
+  }
+});

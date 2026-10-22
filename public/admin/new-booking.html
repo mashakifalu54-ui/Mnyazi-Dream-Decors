@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<!--
+  ADMIN: the office makes a booking for a client (phone, WhatsApp, walk-in).
+  Works with js/admin-new-booking.js; saved through POST /api/admin/bookings.
+  Office only: the data comes from /api/admin/..., which needs the password (lib/auth.js).
+  Every address starts with "/" because these pages live inside /admin/.
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <!-- Makes the page fit phone screens instead of showing a tiny desktop page -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Tells the browser this page has both a light and a dark design -->
+  <meta name="color-scheme" content="light dark">
+  <title>New booking | Mnyazi Admin</title>
+  <!-- Private page: keep it out of Google (CLAUDE.md) -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Tab icon (favicon): the gold "M" on navy. Browsers pick the format they support. -->
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#15224A">
+
+  <!-- Brand fonts from Google Fonts: Marcellus for headings, Manrope for text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Marcellus&family=Manrope:wght@400;600;700;800&display=swap">
+
+  <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/prices.css">
+  <link rel="stylesheet" href="/css/build.css">
+  <link rel="stylesheet" href="/css/status.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body class="admin-body">
+
+  <!-- ===================== HEADER (navy sidebar on laptops, top bar + Menu on phones) ===================== -->
+  <header class="site-header admin-header">
+    <div class="header-row">
+      <a class="brand" href="/admin/">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-name">Mnyazi Admin</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mainNav">Menu</button>
+      <nav class="main-nav" id="mainNav" aria-label="Admin">
+        <a href="/admin/">Booking requests</a>
+        <a href="/admin/new-booking.html">+ New booking</a>
+        <a href="/admin/catalogue.html">Items, prices &amp; packages</a>
+        <a href="/" target="_blank" rel="noopener">View the website</a>
+        <button class="link-btn logout" type="button" id="logoutBtn">Log out</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===================== LOGIN (shown when not logged in) ===================== -->
+  <section class="login-box" id="loginBox" hidden aria-labelledby="loginTitle">
+    <form id="loginForm" class="status-card">
+      <h1 id="loginTitle">Office login</h1>
+      <label class="field">Password
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+      </label>
+      <p class="field-error" id="loginError" role="alert" hidden></p>
+      <button class="btn btn-gold" type="submit">Log in</button>
+    </form>
+  </section>
+
+  <!-- ===================== THE PAGE ===================== -->
+  <main class="admin-main" id="adminApp" hidden>
+    <p><a class="back-link" href="/admin/">← All booking requests</a></p>
+    <div class="admin-title"><h1>New booking</h1></div>
+    <p class="summary-note">For clients who call, WhatsApp or walk in. Prices come from the price list; the same checks as the website.</p>
+
+    <form id="newBookingForm" class="booking-grid" novalidate>
+      <div class="booking-main">
+
+        <!-- Client and event -->
+        <section class="status-card">
+          <h2>Client and event</h2>
+          <div class="new-fields">
+            <label class="field full">Client name<input name="name" maxlength="80" autocomplete="off"></label>
+            <label class="field">Phone (Kenyan)<input name="phone" type="tel" inputmode="tel" placeholder="0712 345 678" autocomplete="off"></label>
+            <label class="field">Type of event<select name="eventType" id="eventType"><option value="">Choose…</option></select></label>
+            <label class="field">Event date<input name="eventDate" type="date" id="eventDate"></label>
+            <label class="field">Guests<input name="guests" type="number" min="1" max="5000" inputmode="numeric"></label>
+            <label class="field">Area<select name="area" id="area"><option value="">Choose…</option></select></label>
+            <label class="field full">Venue and notes from the client<textarea name="notes" rows="2" maxlength="1000"></textarea></label>
+          </div>
+        </section>
+
+        <!-- What they want -->
+        <section class="status-card">
+          <h2>What they want</h2>
+
+          <label class="field">Add a package
+            <select id="packagePicker"><option value="">Choose a package…</option></select>
+          </label>
+
+          <label class="field">Add items from the price list
+            <input id="itemSearch" type="search" placeholder="Type to search, e.g. tent, chiavari, photobooth" autocomplete="off">
+          </label>
+          <ul class="pick-results" id="itemResults"></ul>
+
+          <div class="custom-add">
+            <label class="field grow">Something not on the list<input id="customName" maxlength="120" placeholder="e.g. Gold charger plates"></label>
+            <label class="field">How many<input id="customQty" type="number" min="1" value="1" inputmode="numeric"></label>
+            <label class="field">Price each (if known)<input id="customPrice" type="number" min="0" inputmode="numeric" placeholder="later"></label>
+            <button class="btn btn-outline btn-small" type="button" id="customAdd">Add</button>
+          </div>
+
+          <h3 class="chosen-title">Chosen</h3>
+          <div id="chosenLines"><p class="empty-note">Nothing chosen yet.</p></div>
+        </section>
+      </div>
+
+      <!-- Totals, extras and save -->
+      <aside class="booking-side">
+        <section class="status-card">
+          <h2>Total</h2>
+          <div id="newTotals"></div>
+          <div class="new-fields">
+            <label class="field">Transport (KES)<input name="transportFee" type="number" min="0" step="100" inputmode="numeric" value="0"></label>
+            <label class="field">Discount (KES)<input name="discount" type="number" min="0" step="100" inputmode="numeric" value="0"></label>
+            <label class="field full">Office notes (only the office sees them)<textarea name="officeNotes" rows="2" maxlength="2000"></textarea></label>
+          </div>
+          <label class="check"><input type="checkbox" name="confirm" checked> The client agreed the price: confirm now ("Waiting deposit")</label>
+          <p class="field-error" id="newError" role="alert" hidden></p>
+          <button class="btn btn-gold" type="submit" id="saveBtn">Save booking</button>
+        </section>
+      </aside>
+    </form>
+
+    <p class="admin-foot">© <span id="year">2026</span> Mnyazi Dream Decor</p>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/kenya-phone.js"></script>
+  <script src="/js/admin-common.js"></script>
+  <script src="/js/quote-math.js"></script>
+  <script src="/js/admin-new-booking.js"></script>
+</body>
+
+</html>

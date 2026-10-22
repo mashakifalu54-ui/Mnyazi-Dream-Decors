@@ -4,6 +4,7 @@
 // (Logging in and out is in routes/auth.js, under /api/auth.)
 //   GET  /api/admin/dashboard                        -> the numbers at the top
 //   GET  /api/admin/bookings?filter=attention        -> the table of booking requests
+//   POST /api/admin/bookings                         -> the office makes a new booking for a client
 //   GET  /api/admin/bookings/:id                     -> one booking
 //   POST /api/admin/bookings/:id                     -> save prices, transport, discount, notes
 //   POST /api/admin/bookings/:id/status  { action, reason }  -> confirm / decline / cancel / complete
@@ -38,6 +39,14 @@ router.get('/admin/dashboard', function (request, response) {
 
 router.get('/admin/bookings', function (request, response) {
   response.json(office.listBookings(String(request.query.filter || 'attention')));   // ?filter=... arrives in request.query
+});
+
+router.post('/admin/bookings', function (request, response) {
+  const result = office.createOfficeBooking(request.body);
+  if (result.error) {
+    return response.status(400).json({ error: result.error, field: result.field || null });
+  }
+  response.status(201).json(result);   // { bookingId, bookingNo, warning }
 });
 
 router.get('/admin/bookings/:id', function (request, response) {

@@ -47,7 +47,7 @@ router.post('/bookings', function (request, response) {
   }
   remember(saves, ip);
   // 201 = "created". The page uses the token to open the private status page.
-  response.status(201).json(result);
+  response.status(201).json({ bookingNo: result.bookingNo, token: result.token });
 });
 
 router.get('/status/:token', function (request, response) {

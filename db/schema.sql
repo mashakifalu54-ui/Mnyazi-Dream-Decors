@@ -158,6 +158,7 @@ CREATE TABLE bookings (
   discount        INTEGER NOT NULL DEFAULT 0 CHECK (discount >= 0),       -- added by the office
   deposit_percent INTEGER NOT NULL DEFAULT 50 CHECK (deposit_percent BETWEEN 0 AND 100),  -- copied from settings when the booking is made
   status_token    TEXT NOT NULL UNIQUE,     -- long random code for the customer's private status page
+  source          TEXT NOT NULL DEFAULT 'website' CHECK (source IN ('website', 'office')),   -- who made it: the customer online, or the office
   office_notes    TEXT,
   created_at      TEXT NOT NULL DEFAULT (datetime('now')),   -- SQLite fills in the date and time
   updated_at      TEXT NOT NULL DEFAULT (datetime('now'))

@@ -6,10 +6,11 @@
   4. Items: category chips and cards with Add, then − 3 +
   5. Custom requests ("price pending")
   6. Totals: uses calculateQuote() from quote-math.js (the same maths as the server)
-  7. Review: asks the SERVER to price the quote (/api/quote) and shows the answer
+  7. Review -> Event details -> Sent: the quote priced by the SERVER (/api/quote),
+     the details form, and saving the booking (/api/bookings)
   8. Budget finder: event type, guests, budget, area -> packages that fit (js/budget-fit.js),
      and the budget bar under the total
-  Uses kes() and escapeHtml() from common.js.
+  Uses kes() and escapeHtml() from common.js, normalizeKenyanPhone() from kenya-phone.js.
 */
 
 // ---------- 1. The cart ----------
@@ -314,12 +315,47 @@ function countTo(target) {
 }
 
 
-// ---------- 7. Review (priced by the server) ----------
+// ---------- 7. Review -> Event details -> Sent ----------
+// The pop-up has three steps (the indicator at the top shows where you are):
+//   step 1  Items:   the quote, priced by the SERVER (/api/quote)
+//   step 2  Details: name, phone, event, date, area, notes
+//   step 3  Sent:    the booking is saved (/api/bookings); booking number and private status link
 const review = document.getElementById('review');
 const reviewBody = document.getElementById('reviewBody');
+const reviewFoot = document.getElementById('reviewFoot');
+let lastQuoteOk = false;   // step 2 is only allowed when the server priced the quote without a problem
 
+// The event details are kept in the browser too, so going Back (or a refresh) never loses them
+const DETAILS_KEY = 'mnyazi-details';
+let details = {};
+try { details = JSON.parse(localStorage.getItem(DETAILS_KEY)) || {}; } catch (error) { details = {}; }
+function saveDetails() {
+  try { localStorage.setItem(DETAILS_KEY, JSON.stringify(details)); } catch (error) { /* storage blocked */ }
+}
+
+// Highlights the current step at the top: 1, 2 or 3
+function setStep(step) {
+  ['stepItems', 'stepDetails', 'stepSent'].forEach(function (id, i) {
+    document.getElementById(id).classList.toggle('is-current', i < step);
+  });
+  document.getElementById('reviewTitle').textContent = ['Your quote', 'Event details', 'Request sent'][step - 1];
+}
+
+// What we send to the server: WHAT and HOW MANY only. The server looks up every price itself.
+function currentChoice() {
+  return {
+    items: Object.keys(cart.items).map((id) => ({ id: Number(id), qty: cart.items[id] })),
+    packages: cart.packages.map((id) => ({ id: id })),
+    custom: cart.custom
+  };
+}
+
+// ----- Step 1: Items -----
 async function openReview() {
+  setStep(1);
+  lastQuoteOk = false;
   reviewBody.innerHTML = '<p class="empty-note">Checking prices…</p>';
+  showItemsButtons();
   if (!review.open) { review.showModal(); }
 
   if (!cartLines().length) {
@@ -327,18 +363,11 @@ async function openReview() {
     return;
   }
 
-  // Send WHAT and HOW MANY only. The server looks up every price itself.
-  const choice = {
-    items: Object.keys(cart.items).map((id) => ({ id: Number(id), qty: cart.items[id] })),
-    packages: cart.packages.map((id) => ({ id: id })),
-    custom: cart.custom
-  };
-
   try {
     const answer = await fetch('/api/quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },   // "the body is JSON"
-      body: JSON.stringify(choice)                        // turn the object into JSON text
+      body: JSON.stringify(currentChoice())               // turn the object into JSON text
     });
     const data = await answer.json();
     if (!answer.ok) {          // ok = false for 400/500 answers: show the server's plain-words message
@@ -346,9 +375,16 @@ async function openReview() {
       return;
     }
     showReview(data);
+    lastQuoteOk = true;
+    showItemsButtons();
   } catch (error) {
     reviewBody.innerHTML = '<p class="field-error">Could not reach the server. Check your connection and try again.</p>';
   }
+}
+
+function showItemsButtons() {
+  reviewFoot.innerHTML = '<button class="btn btn-outline" type="button" data-action="close">Add more items</button>'
+    + '<button class="btn btn-gold" type="button" data-action="details"' + (lastQuoteOk ? '' : ' disabled') + '>Continue to event details</button>';
 }
 
 function showReview(quote) {
@@ -373,6 +409,160 @@ function showReview(quote) {
   reviewBody.dataset.lines = JSON.stringify(quote.lines.map((line) => ({ kind: line.kind, id: line.id })));
 }
 
+// ----- Step 2: Event details -----
+function showDetailsForm() {
+  setStep(2);
+  // Start from what they typed before; if nothing, from the budget finder answers
+  const wish = cart.wish || {};
+  const value = (key, fallback) => escapeHtml(details[key] != null && details[key] !== '' ? details[key] : (fallback || ''));
+  const typeOptions = eventTypes.map((t) => t.name);
+  const chosenType = details.eventType || wish.eventType || '';
+  const chosenArea = details.area || wish.area || '';
+  const areaBox = document.getElementById('finderArea');                       // reuse the area list the finder already loaded
+  const areaOptions = Array.from(areaBox.options).slice(1).map((o) => o.value);
+
+  // Every input has a <label>; each error goes in the <p class="field-error"> right under its box
+  reviewBody.innerHTML = '<form id="detailsForm" class="details-form" novalidate>'
+    + field('name', 'Your name', '<input id="dName" name="name" autocomplete="name" maxlength="80" value="' + value('name') + '">')
+    + field('phone', 'Phone (Kenyan, for WhatsApp and M-Pesa)', '<input id="dPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="0712 345 678" value="' + value('phone') + '">')
+    + field('eventType', 'Type of event', '<select id="dEventType" name="eventType"><option value="">Choose…</option>'
+        + typeOptions.map((t) => '<option' + (t === chosenType ? ' selected' : '') + '>' + escapeHtml(t) + '</option>').join('') + '</select>')
+    + field('eventDate', 'Event date', '<input id="dEventDate" name="eventDate" type="date" min="' + tomorrowText() + '" value="' + value('eventDate') + '">')
+    + field('guests', 'Guests', '<input id="dGuests" name="guests" type="number" min="1" max="5000" inputmode="numeric" placeholder="e.g. 120" value="' + value('guests', wish.guests) + '">')
+    + field('area', 'Area', '<select id="dArea" name="area"><option value="">Choose…</option>'
+        + areaOptions.map((a) => '<option' + (a === chosenArea ? ' selected' : '') + '>' + escapeHtml(a) + '</option>').join('') + '</select>')
+    + field('notes', 'Venue and notes (optional)', '<textarea id="dNotes" name="notes" maxlength="1000" rows="3" placeholder="Venue name, colours, set-up time…">' + value('notes') + '</textarea>', true)
+    + '<p class="summary-note full">The office checks every item is free on your date, then sends your quote and the M-Pesa details on WhatsApp. Nothing is charged now.</p>'
+    + '</form>';
+
+  reviewFoot.innerHTML = '<button class="btn btn-outline" type="button" data-action="back">Back</button>'
+    + '<button class="btn btn-gold" type="button" data-action="send">Send booking request</button>';
+
+  // Some boxes start filled in (from last time, or from the budget finder): remember those values now,
+  // otherwise only what the customer TYPES would count, and a pre-filled "Wedding" would be missed.
+  const form = document.getElementById('detailsForm');
+  Array.from(form.elements).forEach(function (box) { details[box.name] = box.value; });
+  saveDetails();
+
+  // Save as they type, so Back never loses anything
+  form.addEventListener('input', function (event) {
+    details[event.target.name] = event.target.value;
+    saveDetails();
+  });
+  document.getElementById('dName').focus();
+
+  function field(name, label, control, full) {
+    return '<label class="field' + (full ? ' full' : '') + '">' + label + control
+      + '<span class="field-error" id="err-' + name + '" role="alert" hidden></span></label>';
+  }
+}
+
+// Tomorrow as 'YYYY-MM-DD' (the earliest event date allowed)
+function tomorrowText() {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+}
+
+// Show one error under its box and move the cursor there
+function showFieldError(name, message) {
+  reviewBody.querySelectorAll('.field-error').forEach((el) => { el.hidden = true; });
+  const box = document.getElementById('err-' + name);
+  if (box) {
+    box.textContent = message;
+    box.hidden = false;
+    const input = box.parentElement.querySelector('input, select, textarea');
+    if (input) { input.focus(); }
+  } else {
+    alert(message);   // an error that belongs to no box (rare)
+  }
+}
+
+// Quick checks in the browser, so the customer hears about a mistake straight away.
+// The server checks everything again: these are for comfort, not for safety.
+function checkDetailsInBrowser() {
+  if (!(details.name || '').trim()) { return showFieldError('name', 'Please add your name.'); }
+  if (!normalizeKenyanPhone(details.phone)) { return showFieldError('phone', 'Use a Kenyan number like 0712 345 678 or +254 712 345 678.'); }
+  if (!details.eventType) { return showFieldError('eventType', 'Please choose the type of event.'); }
+  if (!details.eventDate || details.eventDate < tomorrowText()) { return showFieldError('eventDate', 'Pick an event date from tomorrow onwards.'); }
+  if (details.guests && !(Number(details.guests) >= 1 && Number(details.guests) <= 5000 && Number.isInteger(Number(details.guests)))) {
+    return showFieldError('guests', 'Guests: use a whole number, for example 120.');
+  }
+  return true;
+}
+
+async function sendBooking(button) {
+  if (checkDetailsInBrowser() !== true) { return; }
+  button.disabled = true;               // stop a double tap from sending twice
+  button.textContent = 'Sending…';
+
+  const wish = cart.wish || {};
+  const body = {
+    choice: currentChoice(),
+    details: Object.assign({}, details, { budgetMin: wish.budgetMin, budgetMax: wish.budgetMax })
+  };
+
+  try {
+    const answer = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await answer.json();
+    if (!answer.ok) {
+      button.disabled = false;
+      button.textContent = 'Send booking request';
+      return showFieldError(data.field, data.error);
+    }
+    showSent(data);
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = 'Send booking request';
+    showFieldError(null, 'Could not reach the server. Check your connection and try again.');
+  }
+}
+
+// ----- Step 3: Sent -----
+function showSent(result) {
+  setStep(3);
+  const statusLink = location.origin + '/status/' + result.token;
+  const firstName = (details.name || '').trim().split(' ')[0];
+  const shareText = encodeURIComponent('My Mnyazi Dream Decor booking ' + result.bookingNo + ': ' + statusLink);
+
+  reviewBody.innerHTML = '<div class="sent">'
+    + '<div class="sent-seal" aria-hidden="true">✓</div>'
+    + '<h3>Thank you, ' + escapeHtml(firstName) + '.</h3>'
+    + '<p>Your request <b>' + escapeHtml(result.bookingNo) + '</b> is with the office. They check your date and reply on WhatsApp, usually within 24 hours.</p>'
+    + '<p class="summary-note">Save your private status link. It shows your booking any time:</p>'
+    + '<p class="status-link"><a href="/status/' + result.token + '">' + escapeHtml(statusLink) + '</a></p>'
+    + '</div>';
+
+  reviewFoot.innerHTML = '<a class="btn btn-outline" href="https://wa.me/?text=' + shareText + '" target="_blank" rel="noopener">Save it on WhatsApp</a>'
+    + '<a class="btn btn-gold" href="/status/' + result.token + '">Open my booking</a>';
+
+  // The request is sent: empty the cart and the form for the next visit
+  cart = { items: {}, packages: [], custom: [], wish: null };
+  details = {};
+  saveCart();
+  saveDetails();
+  updateTotals();
+  showItems();
+  showPackages();
+  finderResults.innerHTML = '';
+  finderForm.reset();          // empty the budget questions too
+}
+
+// ----- Buttons and clicks -----
+reviewFoot.addEventListener('click', function (event) {
+  const button = event.target.closest('[data-action]');
+  if (!button) { return; }
+  const action = button.dataset.action;
+  if (action === 'close') { review.close(); }
+  if (action === 'details' && lastQuoteOk) { showDetailsForm(); }
+  if (action === 'back') { openReview(); }
+  if (action === 'send') { sendBooking(button); }
+});
+
 reviewBody.addEventListener('click', function (event) {
   const button = event.target.closest('[data-remove-line]');
   if (!button) { return; }
@@ -390,7 +580,6 @@ reviewBody.addEventListener('click', function (event) {
 
 document.querySelectorAll('[data-open-review]').forEach((button) => button.addEventListener('click', openReview));
 document.getElementById('reviewClose').addEventListener('click', () => review.close());
-document.getElementById('reviewBack').addEventListener('click', () => review.close());
 review.addEventListener('click', (event) => { if (event.target === review) { review.close(); } });   // tap outside = close
 
 

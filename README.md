@@ -16,15 +16,19 @@ Plans and decisions: [PROJECT-NOTES.md](PROJECT-NOTES.md), [CLAUDE.md](CLAUDE.md
 | `npm run db:reset` | Deletes the database and builds a fresh one (careful: removes all bookings) |
 
 Pages: http://localhost:3000 (homepage), /build.html (build your event: quote and total) and /prices.html (prices from the database).
-Data for the browser: `/api/items`, `/api/packages`, `/api/options`, and `POST /api/quote` (prices a quote on the server).
+Data for the browser: `/api/items`, `/api/packages`, `/api/options`, `POST /api/quote` (prices a quote on the server), `POST /api/bookings` (saves a booking request) and `/api/status/<code>`.
+Each booking gets a private page at `/status/<code>` (kept out of Google).
+
+Testing without touching your real database: set `MNYAZI_DB` to another file first, e.g. in PowerShell `$env:MNYAZI_DB = "C:	emp	est.db"; npm start`.
 
 ## Folders
 - `public/`: the website people see (HTML, CSS, JavaScript, photos)
 - `server.js`: starts the web server
 - `routes/`: the web addresses the server answers (`routes/items.js` = price list and packages)
-- `lib/`: shared functions; ALL the SQL lives here (`catalogue.js` prices and packages, `settings.js` office settings, `quote.js` prices a quote)
+- `lib/`: shared functions; ALL the SQL lives here (`catalogue.js` prices and packages, `settings.js` office settings, `quote.js` prices a quote, `bookings.js` saves and reads bookings)
 - `public/js/quote-math.js`: the one function that works out totals, used by BOTH the browser and the server
 - `public/js/budget-fit.js`: picks the packages that fit a budget, guest count and event type
+- `public/js/kenya-phone.js`: checks Kenyan phone numbers (browser and server)
 - `db/`: the database: tables (`schema.sql`), starting data (`seed.sql`) and the scripts that use them
 - `data/`: the database file itself (not saved to GitHub because it holds customer details)
 
@@ -33,4 +37,5 @@ Data for the browser: `/api/items`, `/api/packages`, `/api/options`, and `POST /
 2. Price list on the page from the database: done (packages from the 2024 rate card)
 3. Quote and total: done (build.html)
 3b. Budget finder: done (top of build.html; logic in public/js/budget-fit.js)
-4. Save the booking: next
+4. Save the booking: done (details form, booking number MDD-YYYY-NNNN, private status page)
+5. Admin page for the office: next

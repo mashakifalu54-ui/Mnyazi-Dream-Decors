@@ -255,20 +255,19 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
       </button>
     </div>
+    <!-- Step indicator (DESIGN-PROMPT.md: four steps, visible): choose -> items -> details -> sent -->
     <ol class="review-steps" aria-label="Steps">
-      <li class="is-current">Items</li><li>Details</li><li>Sent</li>
+      <li id="stepItems" class="is-current">Items</li><li id="stepDetails">Details</li><li id="stepSent">Sent</li>
     </ol>
     <div class="review-body" id="reviewBody"></div>
-    <div class="review-foot">
-      <button class="btn btn-outline" type="button" id="reviewBack">Add more items</button>
-      <!-- Step 4 (save the booking) will switch this button on -->
-      <button class="btn btn-gold" type="button" disabled title="Coming in the next build step">Continue to event details</button>
-    </div>
+    <!-- The buttons here change with the step; js/build.js fills them in -->
+    <div class="review-foot" id="reviewFoot"></div>
   </dialog>
 
   <script src="js/common.js"></script>
   <script src="js/quote-math.js"></script>
   <script src="js/budget-fit.js"></script>
+  <script src="js/kenya-phone.js"></script>
   <script src="js/build.js"></script>
 </body>
 

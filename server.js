@@ -6,7 +6,8 @@
 // What it does:
 //   0. checks the database is there and up to date (builds it the first time)
 //   1. sends the files in public/ (HTML, CSS, JavaScript, photos) to the browser
-//   2. answers the /api/... addresses with data from the database (routes/items.js, routes/quote.js)
+//   2. answers the /api/... addresses with data from the database (routes/items.js, quote.js, bookings.js)
+//   3. shows the private status page at /status/<code>
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -44,6 +45,7 @@ if (databaseVersion !== SCHEMA_VERSION) {
 const express = require('express');
 const itemRoutes = require('./routes/items');
 const quoteRoutes = require('./routes/quote');
+const bookingRoutes = require('./routes/bookings');
 
 const app = express();     // "app" is our web server
 const PORT = process.env.PORT || 3000;   // a host can choose the port; on your computer it is 3000
@@ -57,6 +59,14 @@ app.use(express.json({ limit: '20kb' }));
 // 2. Every route in routes/ starts with /api  (so '/items' becomes '/api/items')
 app.use('/api', itemRoutes);
 app.use('/api', quoteRoutes);
+app.use('/api', bookingRoutes);
+
+// 3. The customer's private status page: /status/<long random code>
+//    Every code gets the same page; js/status.js reads the code from the address and asks /api/status/<code>.
+//    robots.txt and a noindex tag keep these pages out of Google.
+app.get('/status/:token', function (request, response) {
+  response.sendFile(path.join(__dirname, 'public', 'status.html'));
+});
 
 // Anything else: a plain "not found" page
 app.use(function (request, response) {

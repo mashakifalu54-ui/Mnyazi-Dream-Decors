@@ -8,7 +8,9 @@ const fs = require('node:fs');
 
 // The database is ONE file: data/mnyazi.db (the data folder is next to the db folder).
 // __dirname means "the folder this file is in".
-const DB_FILE = path.join(__dirname, '..', 'data', 'mnyazi.db');
+// For tests you can point to another file with the MNYAZI_DB setting, so the real one is never touched:
+//   (PowerShell)  $env:MNYAZI_DB = "C:\temp\test.db"; npm start
+const DB_FILE = process.env.MNYAZI_DB || path.join(__dirname, '..', 'data', 'mnyazi.db');
 
 function openDatabase() {
   // Make the data folder if it isn't there yet

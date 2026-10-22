@@ -1,0 +1,50 @@
+/*
+  status.css: extra look for the private status page ONLY (status.html).
+  Loaded after site.css, prices.css and build.css (it reuses their quote lines and totals).
+  Mobile first: one column, then two on wide screens.
+*/
+
+.status-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  padding-top: 32px;
+  padding-bottom: 80px;
+}
+.status-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.status-card h2 { font-size: 26px; }
+
+/* Timeline: a dot per step. Green = done, gold = happening now, grey = later */
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.timeline li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  column-gap: 12px;
+  color: var(--muted);
+}
+.timeline li::before {
+  content: "";
+  grid-row: span 2;
+  width: 14px;
+  height: 14px;
+  margin-top: 5px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+}
+.timeline li.done::before { background: #2e8b57; border-color: #2e8b57; }
+.timeline li.now::before { background: var(--gold); border-color: var(--gold); }
+.timeline li b { color: var(--text); }
+.timeline li span { font-size: 15px; }
+
+@media (min-width: 900px) {
+  .status-page { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .status-card:last-child { grid-column: 1 / -1; }
+}

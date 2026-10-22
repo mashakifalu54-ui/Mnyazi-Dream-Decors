@@ -370,3 +370,43 @@ button.btn { font: inherit; font-weight: 800; cursor: pointer; }
 @media (min-width: 640px) {
   .finder-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* ---------- Event details form (step 2 of the pop-up) ---------- */
+.details-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);   /* phones: one box per line */
+  gap: 14px;
+}
+.details-form textarea {
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  resize: vertical;
+}
+.details-form .field-error { margin: 0; font-size: 14px; }
+@media (min-width: 520px) {
+  .details-form { grid-template-columns: 1fr 1fr; }
+  .details-form .field:nth-child(-n+2),
+  .details-form .full { grid-column: 1 / -1; }   /* name, phone and notes use the full width */
+}
+
+/* ---------- Request sent (step 3) ---------- */
+.sent { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.sent h3 { font-size: 28px; }
+.sent-seal {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #ddf3e6;
+  color: #135c34;
+  font-size: 30px;
+  font-weight: 800;
+}
+.status-link { word-break: break-all; font-size: 14px; }
+.review-foot a.btn { flex: 1 1 auto; }

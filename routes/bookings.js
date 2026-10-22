@@ -10,6 +10,7 @@ const express = require('express');
 const { createBooking, getBookingByToken, getBookingIdByToken } = require('../lib/bookings');
 const { documentTypeFor, getDocumentData } = require('../lib/documents');
 const { writeDocumentPdf } = require('../lib/pdf');
+const payments = require('../lib/payments');
 
 const router = express.Router();
 
@@ -54,6 +55,18 @@ router.get('/status/:token', function (request, response) {
   if (!booking) {
     return response.status(404).json({ error: 'We could not find this booking. Please check the link, or call 0793 463 223.' });
   }
+  // Add the payments: what is paid, what is left, what to pay now, and whether the Pay button works
+  const id = getBookingIdByToken(request.params.token).id;
+  const summary = payments.paymentSummary(id);
+  booking.payments = {
+    paid: summary.paid,
+    leftToPay: summary.leftToPay,
+    dueNow: payments.amountDue(id),
+    payOnline: Boolean(payments.onlineMethod()),
+    list: summary.payments.filter((p) => p.status === 'success').map((p) => ({
+      id: p.id, amount: p.amount, method: p.method, receiptCode: p.receipt_code, date: p.confirmed_at || p.created_at
+    }))
+  };
   response.json(booking);
 });
 

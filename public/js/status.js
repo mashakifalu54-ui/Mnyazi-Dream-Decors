@@ -4,6 +4,8 @@
   2. Title: booking number, event, date, area
   3. Timeline: received -> checked -> quote sent -> deposit paid -> confirmed (DESIGN-PROMPT.md)
   4. The quote lines and totals (worked out on the server with quote-math.js)
+  5. Payments: paid, left, receipts, and the Pay button (CLAUDE.md "Browser confirmation":
+     start the payment, then ask the server every 2.5 seconds until it is paid or failed)
   Uses kes() and escapeHtml() from common.js.
 */
 
@@ -62,6 +64,8 @@ function showBooking(booking) {
   pdf.rel = 'noopener';
   pdf.textContent = isQuote ? 'Download quote (PDF)' : 'Download invoice (PDF)';
   document.getElementById('statusLines').appendChild(pdf);
+
+  showPayments(booking);
 }
 
 
@@ -120,5 +124,110 @@ function showLines(quote) {
     + (quote.transportFee ? '' : '<p class="summary-note">Transport outside Kilifi town is added by the office.</p>');
 }
 
+
+// ---------- 5. Payments ----------
+function showPayments(booking) {
+  const p = booking.payments;
+  const card = document.getElementById('paymentCard');
+  const body = document.getElementById('paymentBody');
+  // Nothing to show before the office confirms (no money is asked for yet)
+  if (!p || (p.paid === 0 && p.dueNow === 0)) { card.hidden = true; return; }
+  card.hidden = false;
+
+  const receipts = p.list.map(function (x) {
+    return '<li><span><b>' + kes(x.amount) + '</b> · ' + escapeHtml(x.method || 'M-Pesa') + (x.receiptCode ? ' · ' + escapeHtml(x.receiptCode) : '')
+      + '<small>' + escapeHtml(x.date.slice(0, 10)) + '</small></span>'
+      + '<a href="/api/status/' + encodeURIComponent(token) + '/receipts/' + x.id + '/pdf" target="_blank" rel="noopener">Receipt (PDF)</a></li>';
+  }).join('');
+
+  const isDeposit = booking.status === 'quoted';
+  let pay = '';
+  if (p.dueNow > 0 && p.payOnline) {
+    pay = '<form id="payForm" class="pay-form" novalidate>'
+      + '<label class="field">Safaricom number that will pay'
+      + '<input id="payPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="0712 345 678"></label>'
+      + '<p class="field-error" id="payError" role="alert" hidden></p>'
+      + '<button class="btn btn-gold" type="submit">Pay ' + (isDeposit ? 'deposit' : 'balance') + ' ' + kes(p.dueNow) + ' with M-Pesa</button>'
+      + '<p class="summary-note">You will get an M-Pesa prompt on that phone. Enter your PIN to pay.</p>'
+      + '</form>';
+  } else if (p.dueNow > 0) {
+    pay = '<p class="summary-note">To pay ' + kes(p.dueNow) + ', use the M-Pesa details on your invoice.</p>';
+  }
+
+  body.innerHTML = '<div class="summary-line"><span>Paid so far</span><span>' + kes(p.paid) + '</span></div>'
+    + '<div class="summary-total"><span>Left to pay</span><b>' + kes(p.leftToPay) + '</b></div>'
+    + (receipts ? '<ul class="payment-list">' + receipts + '</ul>' : '')
+    + pay
+    + (p.leftToPay === 0 ? '<p class="paid-note">Fully paid. Thank you!</p>' : '');
+}
+
+// The Pay button: start, then keep asking until we know (the server decides, the page only shows it)
+document.getElementById('paymentBody').addEventListener('submit', async function (event) {
+  if (event.target.id !== 'payForm') { return; }
+  event.preventDefault();
+  const error = document.getElementById('payError');
+  const button = event.target.querySelector('button');
+  const phone = document.getElementById('payPhone').value;
+  error.hidden = true;
+
+  if (!normalizeKenyanPhone(phone)) {
+    error.textContent = 'Use a Kenyan number like 0712 345 678.';
+    error.hidden = false;
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    const answer = await fetch('/api/payments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token, phone: phone })   // no amount: the server works it out
+    });
+    const data = await answer.json();
+    if (!answer.ok) { throw new Error(data.error); }
+
+    // CLAUDE.md: show "Check your phone and enter your M-Pesa PIN", then poll
+    document.getElementById('paymentBody').innerHTML = '<div class="waiting" role="status">'
+      + '<span class="spinner" aria-hidden="true"></span>'
+      + '<p><b>Check your phone and enter your M-Pesa PIN.</b><br>Paying ' + kes(data.amount) + '. This page updates by itself.</p></div>';
+    waitForPayment(data.paymentId, 0);
+  } catch (problem) {
+    error.textContent = problem.message || 'Could not start the payment. Try again.';
+    error.hidden = false;
+    button.disabled = false;
+  }
+});
+
+// Ask every 2.5 seconds, for at most 2 minutes
+async function waitForPayment(paymentId, tries) {
+  if (tries > 48) {
+    document.getElementById('paymentBody').innerHTML = '<p class="field-error">We have not heard back from M-Pesa yet. If you paid, it will show here soon: refresh the page in a minute.</p>';
+    return;
+  }
+  try {
+    const answer = await fetch('/api/payments/' + paymentId + '?token=' + encodeURIComponent(token));
+    const payment = await answer.json();
+    if (payment.status === 'success') {
+      await loadStatus();   // reload everything: timeline, totals, receipts
+      flashPaid('Paid ' + kes(payment.amount) + '. Thank you! M-Pesa code ' + payment.receiptCode);
+      return;
+    }
+    if (payment.status === 'failed' || payment.status === 'cancelled') {
+      await loadStatus();
+      const error = document.getElementById('payError');
+      if (error) { error.textContent = 'The payment was ' + payment.status + '. Nothing was taken. You can try again.'; error.hidden = false; }
+      return;
+    }
+  } catch (problem) { /* a moment without internet: just ask again */ }
+  setTimeout(() => waitForPayment(paymentId, tries + 1), 2500);
+}
+
+function flashPaid(message) {
+  const note = document.createElement('p');
+  note.className = 'paid-note';
+  note.setAttribute('role', 'status');
+  note.textContent = message;
+  document.querySelector('.status-page').prepend(note);
+}
 
 loadStatus();

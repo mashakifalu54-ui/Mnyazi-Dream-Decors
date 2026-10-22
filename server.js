@@ -55,6 +55,7 @@ const quoteRoutes = require('./routes/quote');
 const bookingRoutes = require('./routes/bookings');
 const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
+const paymentRoutes = require('./routes/payments');
 
 const app = express();     // "app" is our web server
 const PORT = process.env.PORT || 3000;   // a host can choose the port; on your computer it is 3000
@@ -69,6 +70,7 @@ app.use(express.json({ limit: '20kb' }));
 app.use('/api', itemRoutes);
 app.use('/api', quoteRoutes);
 app.use('/api', bookingRoutes);
+app.use('/api', paymentRoutes); // paying from the status page (lib/payments)
 app.use('/api', authRoutes);    // log in / out of the admin page (/api/auth/...)
 app.use('/api', adminRoutes);   // the office admin page; every /api/admin/... needs a login (lib/auth.js)
 

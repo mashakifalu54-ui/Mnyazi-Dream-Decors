@@ -5,6 +5,7 @@
      transport, discount, notes, totals next to the customer's budget
   3. Save the office's changes
   4. Actions: Confirm & send quote, Send on WhatsApp, Decline, Cancel, Mark completed
+  5. Payments: paid so far, left to pay, receipts, and "Record a payment" (lib/payments/manual.js)
   Uses api(), statusChip(), shortDate() from admin-common.js, prettyKenyanPhone() from kenya-phone.js,
   kes() and escapeHtml() from common.js.
 */
@@ -23,8 +24,12 @@ async function loadBooking() {
   }
 }
 
-// Can the office still change prices? Not once the booking is closed
+// Can the office still change prices? Not once the booking is closed, and not once money is paid
+// (the server refuses too: lib/office.js). Office notes can always change while the booking is active.
 function isOpen() {
+  return !['completed', 'declined', 'cancelled', 'deposit_paid', 'fully_paid'].includes(booking.status);
+}
+function notesOpen() {
   return !['completed', 'declined', 'cancelled'].includes(booking.status);
 }
 
@@ -62,7 +67,8 @@ function showBooking() {
     +       '<label class="field full">Office notes (never shown to the client)<textarea name="officeNotes" rows="3" maxlength="2000">' + escapeHtml(b.officeNotes || '') + '</textarea></label>'
     +     '</div>'
     +     '<p class="field-error" id="saveError" role="alert" hidden></p>'
-    +     (isOpen() ? '<button class="btn btn-navy" type="submit">Save changes</button>' : '')
+    +     (isOpen() ? '' : (notesOpen() ? '<p class="summary-note">Payment received: prices are locked. You can still change the office notes.</p>' : ''))
+    +     (notesOpen() ? '<button class="btn btn-navy" type="submit">' + (isOpen() ? 'Save changes' : 'Save notes') + '</button>' : '')
     +   '</form>'
     + '</div>'
 
@@ -73,6 +79,7 @@ function showBooking() {
     +     totalsHtml(b.quote)
     +     '<p class="summary-note">Client\'s budget: ' + budget + '</p>'
     +   '</section>'
+    +   '<section class="status-card" id="payments">' + paymentsHtml() + '</section>'
     +   '<section class="status-card" id="actions">' + actionsHtml() + '</section>'
     + '</aside>'
 
@@ -182,7 +189,7 @@ function actionsHtml() {
       + '<p class="summary-note">Marks it "Waiting deposit" and opens WhatsApp with the quote and the client\'s private link.</p>');
   }
   if (s === 'quoted') {
-    parts.push('<p class="summary-note">Waiting for the ' + kes(booking.quote.deposit) + ' deposit. Recording M-Pesa payments comes in the next build step.</p>');
+    parts.push('<p class="summary-note">Waiting for the deposit. When it arrives, record it under Payments: the booking then moves to "Deposit paid" by itself.</p>');
   }
   if (s === 'deposit_paid' || s === 'fully_paid') {
     parts.push('<button class="btn btn-navy" type="button" data-action="complete">Mark event completed</button>');
@@ -249,6 +256,61 @@ page.addEventListener('click', async function (event) {
     flash('Done: ' + STATUS_LABELS[booking.status] + '.');
   } catch (problem) {
     if (whatsAppTab) { whatsAppTab.close(); }
+    error.textContent = problem.message;
+    error.hidden = false;
+  }
+});
+
+// ---------- 5. Payments ----------
+function paymentsHtml() {
+  const p = booking.payments;
+  const row = (label, value, strong) => '<div class="summary-line"><span>' + label + '</span><span>' + (strong ? '<b>' + value + '</b>' : value) + '</span></div>';
+  const list = p.payments.filter((x) => x.status === 'success').map(function (x) {
+    return '<li><span><b>' + kes(x.amount) + '</b> · ' + escapeHtml(x.method || 'M-Pesa') + (x.receipt_code ? ' · ' + escapeHtml(x.receipt_code) : '')
+      + '<small>' + escapeHtml((x.confirmed_at || x.created_at).slice(0, 16)) + (x.provider !== 'manual' ? ' · paid online' : ' · recorded by the office') + '</small></span>'
+      + '<a href="/api/admin/payments/' + x.id + '/pdf" target="_blank" rel="noopener">Receipt</a></li>';
+  }).join('');
+  const waiting = p.payments.filter((x) => x.status === 'pending' || x.status === 'initiated').length;
+
+  let html = '<h2>Payments</h2>'
+    + row('Paid so far', kes(p.paid))
+    + row('Left to pay', kes(p.leftToPay), true)
+    + (p.depositLeft > 0 && booking.status === 'quoted' ? row('Still needed for the deposit', kes(p.depositLeft)) : '')
+    + (list ? '<ul class="payment-list">' + list + '</ul>' : '<p class="summary-note">No payments yet.</p>')
+    + (waiting ? '<p class="fit-tip">' + waiting + ' online payment(s) waiting for the customer to enter their PIN.</p>' : '');
+
+  // The form only while money is still expected
+  if (['quoted', 'deposit_paid'].includes(booking.status) && p.leftToPay > 0) {
+    const suggest = booking.status === 'quoted' && p.depositLeft > 0 ? p.depositLeft : p.leftToPay;
+    html += '<form id="paymentForm" class="payment-form">'
+      + '<h3>Record a payment</h3>'
+      + '<label class="field">Amount (KES)<input name="amount" type="number" min="1" max="' + p.leftToPay + '" inputmode="numeric" value="' + suggest + '"></label>'
+      + '<label class="field">Paid by<select name="method"><option>M-Pesa</option><option>Cash</option><option>Bank</option></select></label>'
+      + '<label class="field">M-Pesa code (from the SMS)<input name="receiptCode" maxlength="20" placeholder="e.g. SJK7AB12CD" autocapitalize="characters"></label>'
+      + '<label class="field">Note (optional)<input name="note" maxlength="200"></label>'
+      + '<p class="field-error" id="paymentError" role="alert" hidden></p>'
+      + '<button class="btn btn-gold" type="submit">Record payment</button>'
+      + '</form>';
+  }
+  return html;
+}
+
+page.addEventListener('submit', async function (event) {
+  if (event.target.id !== 'paymentForm') { return; }
+  event.preventDefault();
+  const form = event.target;
+  const error = document.getElementById('paymentError');
+  error.hidden = true;
+  try {
+    booking = await api('/api/admin/bookings/' + bookingId + '/payments', {
+      amount: Number(form.elements.amount.value),
+      method: form.elements.method.value,
+      receiptCode: form.elements.receiptCode.value,
+      note: form.elements.note.value
+    });
+    showBooking();
+    flash('Payment recorded. ' + STATUS_LABELS[booking.status] + '.');
+  } catch (problem) {
     error.textContent = problem.message;
     error.hidden = false;
   }

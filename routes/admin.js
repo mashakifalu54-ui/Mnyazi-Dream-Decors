@@ -8,6 +8,8 @@
 //   POST /api/admin/bookings/:id                     -> save prices, transport, discount, notes
 //   POST /api/admin/bookings/:id/status  { action, reason }  -> confirm / decline / cancel / complete
 //   GET  /api/admin/bookings/:id/pdf?type=quote|invoice  -> the document as a PDF
+//   POST /api/admin/bookings/:id/payments { amount, method, receiptCode, note } -> record a payment by hand
+//   GET  /api/admin/payments/:id/pdf                 -> the receipt for one payment
 //   GET  /api/admin/catalogue                        -> items, packages, settings (including hidden ones)
 //   POST /api/admin/items          | /items/:id      -> add an item | change one
 //   POST /api/admin/packages       | /packages/:id   -> add a package | change one
@@ -21,6 +23,8 @@ const office = require('../lib/office');
 const catalogue = require('../lib/office-catalogue');
 const { sendPdf } = require('./bookings');
 const { documentTypeFor } = require('../lib/documents');
+const payments = require('../lib/payments');
+const { sendReceipt } = require('./payments');
 
 const router = express.Router();
 
@@ -61,6 +65,19 @@ router.get('/admin/bookings/:id/pdf', function (request, response) {
   // The office may ask for either; without ?type= it gets the one that fits the status
   const type = ['quote', 'invoice'].includes(request.query.type) ? request.query.type : documentTypeFor(booking.status);
   sendPdf(request, response, booking.id, type);
+});
+
+// ---------- Payments recorded by the office (lib/payments/manual.js) ----------
+router.post('/admin/bookings/:id/payments', function (request, response) {
+  const body = request.body || {};
+  const result = payments.startPayment(Number(request.params.id), 'manual', null, body.amount,
+    { method: body.method, receiptCode: body.receiptCode, note: body.note });
+  if (result.error) { return response.status(400).json(result); }
+  response.json(office.getBookingForOffice(Number(request.params.id)));
+});
+
+router.get('/admin/payments/:id/pdf', function (request, response) {
+  sendReceipt(request, response, Number(request.params.id));
 });
 
 // ---------- Items, prices, packages, settings ----------

@@ -10,7 +10,8 @@
     "start": "node server.js",
     "db:setup": "node db/setup.js",
     "db:reset": "node db/setup.js --reset",
-    "db:check": "node db/check.js"
+    "db:check": "node db/check.js",
+    "admin:password": "node scripts/set-admin-password.js"
   },
   "dependencies": {
     "express": "^5.3.0"

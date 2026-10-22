@@ -90,8 +90,10 @@ function showTimeline(booking) {
 // ---------- 4. Quote lines ----------
 function showLines(quote) {
   const lines = quote.lines.map(function (line) {
-    const pending = line.unit_price == null;
-    const amount = pending ? '<span class="pending">Price pending</span>' : kes(line.line_total);
+    const unavailable = line.status === 'unavailable';      // the office can't supply it on that date
+    const pending = !unavailable && line.unit_price == null;
+    const amount = unavailable ? '<span class="pending">Not available</span>'
+      : pending ? '<span class="pending">Price pending</span>' : kes(line.line_total);
     const meta = pending ? line.qty + ' requested' : line.qty + ' × ' + kes(line.unit_price);
     return '<div class="review-line' + (pending ? ' is-custom' : '') + '">'
       + '<span class="name">' + escapeHtml(line.name) + '</span><span class="amount">' + amount + '</span>'

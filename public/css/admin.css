@@ -1,0 +1,193 @@
+/*
+  admin.css: the office admin pages ONLY (/admin/).
+  Loaded after site.css, prices.css and build.css (reuses buttons, chips, fields, totals).
+  DESIGN-PROMPT.md: calmer and denser than the customer site, navy sidebar, status chips,
+  big numbers for what needs attention, works on a phone too.
+  Mobile first: phones get a top bar with Menu; laptops (1000px+) get the navy sidebar.
+*/
+
+.admin-body { background: var(--bg); }
+
+/* Anything with the "hidden" switch stays hidden, even if a rule below gives it display: grid or flex
+   (the login box and the page swap places with it) */
+.admin-body [hidden] { display: none !important; }
+.admin-header .header-row { padding: 0 16px; }
+.admin-main { padding: 24px 16px 60px; max-width: 1200px; }
+.admin-foot { margin-top: 40px; font-size: 13px; color: var(--muted); }
+.back-link { font-weight: 700; color: var(--text); text-decoration: none; }
+
+/* The Log out button sits in the menu with the links */
+.main-nav .logout { color: #d7dbea; padding: 10px 12px; text-align: left; font-size: 15px; }
+.main-nav .logout:hover { color: #fff; }
+
+/* Title row: heading + button or status chip */
+.admin-title { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 8px; }
+.admin-title h1 { font-size: clamp(28px, 4vw, 40px); }
+button.btn-small { min-height: 44px; padding: 0 18px; font-size: 14px; }
+
+/* ---------- Login ---------- */
+.login-box { display: grid; place-items: center; min-height: 70vh; padding: 16px; }
+.login-box form { width: min(420px, 100%); }
+.login-box h1 { font-size: 30px; }
+.login-box input {
+  height: 48px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 10px;
+  background: var(--bg); color: var(--text); font: inherit;
+}
+
+/* ---------- Big numbers ---------- */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0 8px;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+.stat b { font-size: 34px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stat span { font-size: 14px; color: var(--muted); }
+.stat.is-warn { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+
+/* ---------- Status chips (colours from the design canvas) ---------- */
+.status-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: #eef1f6;
+  color: #5a627a;
+}
+.status-new { background: #fdecc8; color: #7a4b00; }
+.status-needs_price { background: #e6e1f7; color: #3e2e85; }
+.status-quoted { background: #e3ecfb; color: #1d3f86; }
+.status-deposit_paid, .status-fully_paid { background: #ddf3e6; color: #135c34; }
+.status-declined, .status-cancelled { background: #f9dedc; color: #8c1d18; }
+
+/* ---------- The table: cards on phones, a real table on laptops ---------- */
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table thead { display: none; }   /* phones: no header row, each cell shows its own label */
+.admin-table tr {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.admin-table td { display: flex; flex-direction: column; font-size: 15px; }
+.admin-table td::before { content: attr(data-label); font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.admin-table small { color: var(--muted); font-size: 13px; }
+.admin-table a { color: var(--text); }
+.admin-table .num { font-variant-numeric: tabular-nums; }
+
+@media (min-width: 900px) {
+  .admin-table { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .admin-table thead { display: table-header-group; }
+  .admin-table tr { display: table-row; border: 0; border-radius: 0; padding: 0; margin: 0; }
+  .admin-table th, .admin-table td { display: table-cell; padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .admin-table th { font-size: 13px; color: var(--muted); background: var(--tint); }
+  .admin-table td::before { display: none; }
+  .admin-table td small { display: block; }
+  .admin-table .num { text-align: right; }
+}
+
+/* ---------- One booking ---------- */
+.booking-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+.booking-main, .booking-side { display: flex; flex-direction: column; gap: 18px; }
+
+.facts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.fact { display: flex; flex-direction: column; }
+.fact span { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.fact small { color: var(--muted); }
+.fact a { color: var(--text); }
+
+.office-lines { display: flex; flex-direction: column; }
+.office-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.office-line.is-custom { background: var(--tint); border-radius: 10px; padding: 12px; border: 0; margin: 6px 0; }
+.office-line.is-unavailable .office-line-main b { text-decoration: line-through; color: var(--muted); }
+.office-line-main { display: flex; flex-direction: column; gap: 2px; }
+.office-line-price { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.price-fixed { font-weight: 700; font-variant-numeric: tabular-nums; }
+.price-input { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.price-input input {
+  width: 120px; height: 44px; padding: 0 10px; border: 1.5px solid var(--gold); border-radius: 10px;
+  background: var(--surface); color: var(--text); font: inherit; font-weight: 700;
+}
+.check { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; cursor: pointer; }
+.check input { width: 20px; height: 20px; accent-color: var(--navy); }
+
+.stock { font-size: 13px; color: var(--muted); }
+.stock.is-ok { color: #135c34; }
+.stock.is-short { color: #b3261e; font-weight: 700; }
+.stock.is-custom { color: var(--gold-text); font-weight: 700; }
+
+.office-extras { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 8px 0 4px; }
+/* width: 100% + min-width: 0 = boxes shrink to fit the column instead of pushing past the edge on phones */
+.office-extras input, .office-extras textarea { width: 100%; min-width: 0; }
+.office-extras .full { grid-column: 1 / -1; }
+.office-extras input, .office-extras textarea {
+  height: 48px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 10px;
+  background: var(--bg); color: var(--text); font: inherit;
+}
+.office-extras textarea { height: auto; padding: 10px 12px; resize: vertical; }
+
+#actions .btn { width: 100%; }
+.danger { border-top: 1px solid var(--line); padding-top: 12px; }
+.danger summary { cursor: pointer; font-weight: 700; color: #b3261e; min-height: 32px; }
+.danger .field { margin: 10px 0; }
+.danger input { height: 44px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); font: inherit; }
+
+/* Small "Saved." message at the bottom */
+.toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 90;
+  transform: translate(-50%, 20px); opacity: 0;
+  background: var(--text); color: var(--bg);
+  padding: 10px 18px; border-radius: 999px; font-weight: 700;
+  transition: opacity 0.25s, transform 0.25s; pointer-events: none;
+}
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-color-scheme: dark) {
+  .status-chip { background: #28325a; color: #c9cee0; }
+  .status-new { background: #3a2a10; color: #f2b866; }
+  .status-needs_price { background: #2a2350; color: #c4b8ff; }
+  .status-quoted { background: #182a52; color: #9cbcff; }
+  .status-deposit_paid, .status-fully_paid { background: #173a28; color: #7fd6a2; }
+  .status-declined, .status-cancelled { background: #3e1a18; color: #ff8a80; }
+  .stock.is-ok { color: #7fd6a2; }
+  .stock.is-short, .danger summary { color: #ff8a80; }
+}
+
+/* ---------- Bigger screens ---------- */
+@media (min-width: 640px) {
+  .stat-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .office-line:not(.is-custom) { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+}
+
+@media (min-width: 1000px) {
+  /* The navy sidebar: the header stands on the left, full height */
+  .admin-body { padding-left: 240px; }
+  .admin-header { position: fixed; top: 0; left: 0; bottom: 0; width: 240px; }
+  .admin-header .header-row { flex-direction: column; align-items: stretch; justify-content: flex-start; padding: 22px 16px; gap: 28px; }
+  .admin-header .main-nav { display: flex; position: static; flex-direction: column; align-items: stretch; padding: 0; border: 0; background: none; }
+  .admin-header .menu-btn { display: none; }
+  .admin-main { padding: 32px 36px 60px; }
+  .booking-grid { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; }
+  .booking-side { position: sticky; top: 24px; }
+}

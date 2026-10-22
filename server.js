@@ -8,11 +8,18 @@
 //   1. sends the files in public/ (HTML, CSS, JavaScript, photos) to the browser
 //   2. answers the /api/... addresses with data from the database (routes/items.js, quote.js, bookings.js)
 //   3. shows the private status page at /status/<code>
+//   4. the office admin page at /admin/ (password in .env: npm run admin:password)
 
 const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const { DB_FILE } = require('./db/connection');
+
+// Secrets (the admin password hash, later M-Pesa keys) live in .env, which never goes to GitHub.
+// process.loadEnvFile reads it into process.env (built into Node, nothing to install).
+if (fs.existsSync(path.join(__dirname, '.env'))) {
+  process.loadEnvFile(path.join(__dirname, '.env'));
+}
 
 
 // ---------- 0. Database check (runs BEFORE anything reads the database) ----------
@@ -46,6 +53,7 @@ const express = require('express');
 const itemRoutes = require('./routes/items');
 const quoteRoutes = require('./routes/quote');
 const bookingRoutes = require('./routes/bookings');
+const adminRoutes = require('./routes/admin');
 
 const app = express();     // "app" is our web server
 const PORT = process.env.PORT || 3000;   // a host can choose the port; on your computer it is 3000
@@ -60,6 +68,7 @@ app.use(express.json({ limit: '20kb' }));
 app.use('/api', itemRoutes);
 app.use('/api', quoteRoutes);
 app.use('/api', bookingRoutes);
+app.use('/api', adminRoutes);   // the office admin page; needs the password (lib/auth.js)
 
 // 3. The customer's private status page: /status/<long random code>
 //    Every code gets the same page; js/status.js reads the code from the address and asks /api/status/<code>.

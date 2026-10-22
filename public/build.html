@@ -124,6 +124,14 @@
         <!-- Price-list items -->
         <section class="build-block" id="items" aria-labelledby="itemsTitle">
           <h2 id="itemsTitle">Or pick single items</h2>
+          <!-- Guest count (CLAUDE.md "Lessons from other sites"): seats, tables, settings and tents follow it -->
+          <div class="guest-bar">
+            <label class="field">How many guests?
+              <input id="guestCount" type="number" min="1" max="5000" inputmode="numeric" placeholder="e.g. 150">
+            </label>
+            <p class="summary-note">Seats, tables, table settings and tents follow this number. Change any of them by hand and it stays as you set it.</p>
+          </div>
+          <p class="guest-changes" id="guestChanges" role="status" hidden></p>
           <div class="chips" id="categoryChips" aria-label="Show a category"></div>
           <div class="item-grid" id="itemGrid"><p class="loading">Loading prices…</p></div>
         </section>

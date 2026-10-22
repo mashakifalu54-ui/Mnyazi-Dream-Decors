@@ -26,7 +26,7 @@ INSERT INTO settings (key, value) VALUES
   ('balance_due_days', ''),       -- balance due this many days before the event; empty = "before set-up day"
   -- The version of the table design. server.js compares it with the number it expects,
   -- so an old database is spotted straight away. Raise both when schema.sql changes.
-  ('schema_version',   '6');
+  ('schema_version',   '7');
 
 
 -- ---------- Budget ranges (the one-tap chips in the budget finder) ----------
@@ -106,6 +106,15 @@ INSERT INTO items (id, category_id, name, description, unit_price, stock_count, 
   (46, 7, 'Video Coverage (1 Camera)',          NULL, 15000, NULL, 46, NULL),
   (47, 7, 'Video Coverage (3 Cameras)',         NULL, 30000, NULL, 47, NULL),
   (48, 7, 'Video Coverage (3 Cameras) + Live Streaming', NULL, 45000, NULL, 48, NULL);
+
+
+-- ---------- Guest-linked items: one per how many guests (our first guesses: the office can change them) ----------
+-- Seats, seat covers and table settings: one per guest. Tables and centre pieces: one per 10 guests.
+-- Tents, tent draping and tent carpets: one per tent size.
+UPDATE items SET per_guests = 1   WHERE id IN (4, 5, 6, 7, 8, 36);   -- seats, seat cover, complete table setup
+UPDATE items SET per_guests = 10  WHERE id IN (22, 23, 24, 25, 33, 34);   -- tables, centre pieces
+UPDATE items SET per_guests = 80  WHERE id IN (1, 12, 16);   -- 80-seater tent, tent draping, 50-80 seater carpet
+UPDATE items SET per_guests = 100 WHERE id IN (15, 32);      -- 100-seater carpet, 100-seater draped canopy
 
 
 -- ---------- Packages (from the OLD 2024 rate card: docs/rate-card-2024.pdf) ----------

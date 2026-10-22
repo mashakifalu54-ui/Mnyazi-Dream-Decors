@@ -410,3 +410,26 @@ button.btn { font: inherit; font-weight: 800; cursor: pointer; }
 }
 .status-link { word-break: break-all; font-size: 14px; }
 .review-foot a.btn { flex: 1 1 auto; }
+
+/* ---------- Guest count ---------- */
+.guest-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px 16px;
+  align-items: end;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 16px 0 6px;
+}
+.guest-bar input {
+  height: 48px; padding: 0 12px; border: 1.5px solid var(--gold); border-radius: 10px;
+  background: var(--bg); color: var(--text); font: inherit; font-weight: 700; width: 100%; max-width: 200px;
+}
+.guest-bar .summary-note { margin: 0; }
+/* "Chairs went from 100 to 150": a gold-tinted note that stays until the next change */
+.guest-changes { background: var(--tint); border-left: 4px solid var(--gold); border-radius: 8px; padding: 10px 14px; margin: 8px 0 0; font-weight: 600; }
+.guest-note { grid-column: 2; margin: 0; font-size: 13px; color: var(--gold-text); font-weight: 600; }
+.guest-note .link-btn { color: var(--gold-text); text-decoration: underline; min-height: 24px; font-size: 13px; }
+@media (min-width: 640px) { .guest-bar { grid-template-columns: 220px minmax(0, 1fr); } }

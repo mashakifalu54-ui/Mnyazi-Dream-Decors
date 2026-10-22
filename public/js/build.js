@@ -8,6 +8,8 @@
   6. Totals: uses calculateQuote() from quote-math.js (the same maths as the server)
   7. Review -> Event details -> Sent: the quote priced by the SERVER (/api/quote),
      the details form, and saving the booking (/api/bookings)
+  4b. Guest count: guest-linked items (seats, tables, tents...) resize when the guests change,
+      and the page says what changed. Items the customer set by hand stay as set.
   8. Budget finder: event type, guests, budget, area -> packages that fit (js/budget-fit.js),
      and the budget bar under the total
   Uses kes() and escapeHtml() from common.js, normalizeKenyanPhone() from kenya-phone.js.
@@ -20,14 +22,18 @@
 // wish:     what the customer told the budget finder, or null:
 //           { eventType, guests, area, budgetMin, budgetMax, budgetLabel, rangeId }
 //           Kept with the cart so step 4 can save it on the booking.
-let cart = { items: {}, packages: [], custom: [], wish: null };
+// guests:   how many guests (or null); guest-linked items follow it
+// handSet:  { itemId: true } for items the customer changed by hand: those no longer follow the guests
+let cart = { items: {}, packages: [], custom: [], wish: null, guests: null, handSet: {} };
 
 // Saved in the browser (localStorage) so a refresh or "back" never loses the customer's choices.
 // try/catch: some browsers block storage (private mode); then the page still works, it just forgets.
 const SAVE_KEY = 'mnyazi-cart';
 try {
   const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-  if (saved && saved.items && saved.packages && saved.custom) { cart = saved; }
+  if (saved && saved.items && saved.packages && saved.custom) {
+    cart = Object.assign({ wish: null, guests: null, handSet: {} }, saved);   // older saved carts lack the new parts
+  }
 } catch (error) { /* nothing saved, or storage blocked: start empty */ }
 
 function saveCart() {
@@ -59,6 +65,7 @@ async function loadPage() {
     eventTypes = options.eventTypes;
     budgetRanges = options.budgetRanges;
     setUpFinder(options.areas);
+    document.getElementById('guestCount').value = cart.guests || '';   // back on the page: show the saved number
     groups.forEach((group) => group.items.forEach((item) => { itemsById[item.id] = item; }));
     packages.forEach((pack) => { packagesById[pack.id] = pack; });
     document.querySelectorAll('.deposit-percent').forEach((el) => { el.textContent = depositPercent; });
@@ -161,11 +168,22 @@ function itemCard(item) {
   const lineTotal = qty
     ? '<p class="line-total">' + qty + ' × ' + item.unit_price.toLocaleString('en-KE') + ' = <b>' + kes(qty * item.unit_price) + '</b></p>'
     : '';
+  // Guest-linked items say so: following the guests, or set by hand (with a way back)
+  let guestNote = '';
+  if (item.per_guests) {
+    if (qty && cart.handSet[item.id] && cart.guests) {
+      guestNote = '<p class="guest-note">Set by you. <button class="link-btn" type="button" data-follow="' + item.id + '">Follow guests again (' + suggestedQty(item) + ')</button></p>';
+    } else if (cart.guests) {
+      guestNote = '<p class="guest-note">' + (qty ? 'Follows your ' : 'For your ') + cart.guests + ' guests: ' + suggestedQty(item) + '</p>';
+    } else {
+      guestNote = '<p class="guest-note">One per ' + (item.per_guests === 1 ? 'guest' : item.per_guests + ' guests') + '</p>';
+    }
+  }
   return '<article class="item-card' + (qty ? ' is-chosen' : '') + '" data-id="' + item.id + '">'
     + '<div class="item-tile" aria-hidden="true">' + initials(item.name) + '</div>'
     + '<div><h3>' + escapeHtml(item.name) + '</h3>' + description
     + '<div class="item-row"><span class="item-price">' + kes(item.unit_price) + ' <small>each</small></span>' + control + '</div></div>'
-    + lineTotal + '</article>';
+    + lineTotal + guestNote + '</article>';
 }
 
 function showItems() {
@@ -185,19 +203,75 @@ function refreshItem(id) {
   old.replaceWith(box.firstElementChild);
 }
 
-function setQty(id, qty) {
+// byHand = true when the customer typed a number or pressed + / -: that item stops following the guests
+function setQty(id, qty, byHand) {
   qty = Math.max(0, Math.min(9999, Math.floor(Number(qty) || 0)));   // a whole number from 0 to 9999
-  if (qty === 0) { delete cart.items[id]; } else { cart.items[id] = qty; }
+  if (qty === 0) {
+    delete cart.items[id];
+    delete cart.handSet[id];
+  } else {
+    cart.items[id] = qty;
+    if (byHand) { cart.handSet[id] = true; } else { delete cart.handSet[id]; }
+  }
   refreshItem(id);
   changed();
 }
+
+
+// ---------- 4b. Guest count ----------
+// For guest-linked items: one per per_guests guests, rounded UP (Math.ceil): 95 guests / 10 = 10 tables
+function suggestedQty(item) {
+  if (!item.per_guests || !cart.guests) { return null; }
+  return Math.ceil(cart.guests / item.per_guests);
+}
+
+// The guest count changed: resize what follows it, and say what changed
+function setGuests(guests) {
+  cart.guests = guests;
+  const changes = [];
+  const kept = [];
+  Object.keys(cart.items).forEach(function (id) {
+    const item = itemsById[id];
+    if (!item || !item.per_guests || !guests) { return; }
+    if (cart.handSet[id]) { kept.push(item.name); return; }
+    const before = cart.items[id];
+    const after = suggestedQty(item);
+    if (after !== before) {
+      cart.items[id] = after;
+      changes.push(item.name + ' went from ' + before + ' to ' + after);
+    }
+  });
+
+  const note = document.getElementById('guestChanges');
+  const parts = [];
+  if (changes.length) { parts.push(changes.join('. ') + '.'); }
+  if (kept.length) { parts.push('Kept as you set: ' + kept.join(', ') + '.'); }
+  note.textContent = parts.join(' ');
+  note.hidden = parts.length === 0;
+
+  document.getElementById('guestCount').value = guests || '';
+  showItems();
+  changed();
+}
+
+document.getElementById('guestCount').addEventListener('change', function (event) {
+  const guests = Math.floor(Number(event.target.value));
+  setGuests(guests >= 1 && guests <= 5000 ? guests : null);
+});
+
 
 const itemGrid = document.getElementById('itemGrid');
 itemGrid.addEventListener('click', function (event) {
   const button = event.target.closest('[data-step]');
   if (!button) { return; }
   const id = button.closest('.item-card').dataset.id;
-  setQty(id, (cart.items[id] || 0) + Number(button.dataset.step));
+  const item = itemsById[id];
+  // "Add" on a guest-linked item when we know the guests: start at the right amount, following the guests
+  if (!cart.items[id] && Number(button.dataset.step) === 1 && suggestedQty(item)) {
+    setQty(id, suggestedQty(item), false);
+  } else {
+    setQty(id, (cart.items[id] || 0) + Number(button.dataset.step), true);
+  }
   // after the redraw, keep the keyboard on the same card
   const card = document.querySelector('.item-card[data-id="' + id + '"]');
   const next = card && (card.querySelector('[data-step="' + button.dataset.step + '"]') || card.querySelector('[data-step]'));
@@ -206,7 +280,15 @@ itemGrid.addEventListener('click', function (event) {
 // Typing a number in the box: "change" happens when the customer leaves the box or presses Enter
 itemGrid.addEventListener('change', function (event) {
   if (!event.target.matches('.stepper input')) { return; }
-  setQty(event.target.closest('.item-card').dataset.id, event.target.value);
+  setQty(event.target.closest('.item-card').dataset.id, event.target.value, true);
+});
+
+// "Follow guests again": the item goes back to following the guest count
+itemGrid.addEventListener('click', function (event) {
+  const button = event.target.closest('[data-follow]');
+  if (!button) { return; }
+  const item = itemsById[button.dataset.follow];
+  setQty(item.id, suggestedQty(item), false);
 });
 
 
@@ -428,7 +510,7 @@ function showDetailsForm() {
     + field('eventType', 'Type of event', '<select id="dEventType" name="eventType"><option value="">Choose…</option>'
         + typeOptions.map((t) => '<option' + (t === chosenType ? ' selected' : '') + '>' + escapeHtml(t) + '</option>').join('') + '</select>')
     + field('eventDate', 'Event date', '<input id="dEventDate" name="eventDate" type="date" min="' + tomorrowText() + '" value="' + value('eventDate') + '">')
-    + field('guests', 'Guests', '<input id="dGuests" name="guests" type="number" min="1" max="5000" inputmode="numeric" placeholder="e.g. 120" value="' + value('guests', wish.guests) + '">')
+    + field('guests', 'Guests', '<input id="dGuests" name="guests" type="number" min="1" max="5000" inputmode="numeric" placeholder="e.g. 120" value="' + value('guests', cart.guests || wish.guests) + '">')
     + field('area', 'Area', '<select id="dArea" name="area"><option value="">Choose…</option>'
         + areaOptions.map((a) => '<option' + (a === chosenArea ? ' selected' : '') + '>' + escapeHtml(a) + '</option>').join('') + '</select>')
     + field('notes', 'Venue and notes (optional)', '<textarea id="dNotes" name="notes" maxlength="1000" rows="3" placeholder="Venue name, colours, set-up time…">' + value('notes') + '</textarea>', true)
@@ -542,7 +624,7 @@ function showSent(result) {
     + '<a class="btn btn-gold" href="/status/' + result.token + '">Open my booking</a>';
 
   // The request is sent: empty the cart and the form for the next visit
-  cart = { items: {}, packages: [], custom: [], wish: null };
+  cart = { items: {}, packages: [], custom: [], wish: null, guests: null, handSet: {} };
   details = {};
   saveCart();
   saveDetails();
@@ -551,6 +633,8 @@ function showSent(result) {
   showPackages();
   finderResults.innerHTML = '';
   finderForm.reset();          // empty the budget questions too
+  document.getElementById('guestCount').value = '';
+  document.getElementById('guestChanges').hidden = true;
 }
 
 // ----- Buttons and clicks -----
@@ -655,6 +739,7 @@ finderForm.addEventListener('submit', function (event) {
   }
 
   cart.wish = wish;
+  if (guests) { setGuests(guests); }   // the finder's guest count drives the items too
   saveCart();
   updateTotals();      // the budget bar appears under the total
   showFinderResults(wish);

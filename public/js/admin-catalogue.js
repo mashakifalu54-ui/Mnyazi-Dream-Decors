@@ -64,7 +64,7 @@ function showItems() {
 // One form for one item. item = null makes the empty "Add an item" form.
 function itemForm(item) {
   const isNew = !item;
-  item = item || { id: '', name: '', description: '', category_id: data.categories[0].id, unit_price: '', stock_count: '', is_visible: 1, office_note: '' };
+  item = item || { id: '', name: '', description: '', category_id: data.categories[0].id, unit_price: '', stock_count: '', per_guests: '', is_visible: 1, office_note: '' };
   const categoryOptions = data.categories.map((c) =>
     '<option value="' + c.id + '"' + (c.id === item.category_id ? ' selected' : '') + '>' + escapeHtml(c.name) + '</option>').join('');
   const value = (v) => escapeHtml(v == null ? '' : v);
@@ -78,9 +78,10 @@ function itemForm(item) {
     +   '<label class="field small">We own<input name="stockCount" type="number" min="0" inputmode="numeric" placeholder="?" value="' + value(item.stock_count) + '"></label>'
     +   '<label class="check">' + '<input type="checkbox" name="isVisible"' + (item.is_visible ? ' checked' : '') + '> Shown</label>'
     + '</div>'
-    + '<details class="more"><summary>Description and office note</summary>'
+    + '<details class="more"><summary>Description, office note, guest count' + (item.per_guests ? ' (1 per ' + item.per_guests + ')' : '') + '</summary>'
     +   '<label class="field">Description (customers see it)<input name="description" maxlength="300" value="' + value(item.description) + '"></label>'
     +   '<label class="field">Office note (only the office sees it)<input name="officeNote" maxlength="300" value="' + value(item.office_note) + '"></label>'
+    +   '<label class="field">Follows the guest count: one per how many guests? (1 = per guest, 10 = per 10 guests; empty = no)<input name="perGuests" type="number" min="1" max="1000" inputmode="numeric" value="' + value(item.per_guests) + '"></label>'
     + '</details>'
     + '<div class="form-foot"><button class="btn btn-navy btn-small" type="submit">' + (isNew ? 'Add item' : 'Save') + '</button>'
     + '<span class="form-message" role="status"></span></div>'

@@ -68,6 +68,10 @@ CREATE TABLE items (
   description TEXT,                        -- optional extra words (what is included)
   unit_price  INTEGER NOT NULL CHECK (unit_price >= 0),     -- KES for one, for one event day
   stock_count INTEGER CHECK (stock_count >= 0),             -- how many the client owns; empty = not known yet
+  -- Guest-linked items follow the guest count on the Build page (CLAUDE.md "Lessons from other sites"):
+  -- one for every per_guests guests, rounded up. 1 = one per guest (seats), 10 = one per 10 guests (tables),
+  -- 80 = one per 80 guests (an 80-seater tent). Empty = not linked to guests (a stage, a photobooth).
+  per_guests  INTEGER CHECK (per_guests > 0),
   photo       TEXT,                        -- file name in public/images, empty = no photo yet
   is_visible  INTEGER NOT NULL DEFAULT 1 CHECK (is_visible IN (0, 1)),  -- 1 = shown to customers, 0 = hidden
   sort_order  INTEGER NOT NULL DEFAULT 0,

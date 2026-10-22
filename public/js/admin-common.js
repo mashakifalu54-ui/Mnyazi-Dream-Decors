@@ -18,9 +18,14 @@ async function api(address, sendData) {
   };
   const answer = await fetch(address, options);
   const data = await answer.json();
-  if (answer.status === 401 && !address.endsWith('/login')) {   // logged out (or the server restarted): ask again
-    showLogin();
-    throw new Error(data.error);
+  // Without a valid login, every /api/admin/... answers 404 (CLAUDE.md: the server is the lock).
+  // So on a 404 we ask "am I still logged in?"; if not (session ended, server restarted), show the login box.
+  if (answer.status === 404 && address.startsWith('/api/admin/')) {
+    const me = await (await fetch('/api/auth/me')).json();
+    if (!me.loggedIn) {
+      showLogin();
+      throw new Error('Please log in again.');
+    }
   }
   if (!answer.ok) { throw new Error(data.error || 'Something went wrong.'); }
   return data;
@@ -34,7 +39,7 @@ let pageLoader = null;
 
 async function startAdminPage(load) {
   pageLoader = load;
-  const me = await api('/api/admin/me');
+  const me = await api('/api/auth/me');
   if (me.loggedIn) { showApp(); load(); } else { showLogin(me.passwordSet); }
 }
 
@@ -58,7 +63,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   const error = document.getElementById('loginError');
   error.hidden = true;
   try {
-    await api('/api/admin/login', { password: document.getElementById('loginPassword').value });
+    await api('/api/auth/login', { password: document.getElementById('loginPassword').value });
     document.getElementById('loginPassword').value = '';   // don't leave the password in the box
     showApp();
     if (pageLoader) { pageLoader(); }
@@ -69,7 +74,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 });
 
 document.getElementById('logoutBtn').addEventListener('click', async function () {
-  await api('/api/admin/logout', {});
+  await api('/api/auth/logout', {});
   showLogin();
 });
 

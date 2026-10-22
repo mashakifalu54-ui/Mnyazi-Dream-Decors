@@ -33,7 +33,7 @@ if (!fs.existsSync(DB_FILE)) {
 // Old database from an earlier build step: the tables changed, so stop with a clear message.
 // (We never delete it automatically: one day it will hold real bookings.)
 // db/seed.sql saves 'schema_version' in the settings table. Raise BOTH numbers when schema.sql changes.
-const SCHEMA_VERSION = '4';
+const SCHEMA_VERSION = '5';
 const { getSetting } = require('./lib/settings');
 let databaseVersion = null;
 try {
@@ -54,6 +54,7 @@ const itemRoutes = require('./routes/items');
 const quoteRoutes = require('./routes/quote');
 const bookingRoutes = require('./routes/bookings');
 const adminRoutes = require('./routes/admin');
+const authRoutes = require('./routes/auth');
 
 const app = express();     // "app" is our web server
 const PORT = process.env.PORT || 3000;   // a host can choose the port; on your computer it is 3000
@@ -68,7 +69,8 @@ app.use(express.json({ limit: '20kb' }));
 app.use('/api', itemRoutes);
 app.use('/api', quoteRoutes);
 app.use('/api', bookingRoutes);
-app.use('/api', adminRoutes);   // the office admin page; needs the password (lib/auth.js)
+app.use('/api', authRoutes);    // log in / out of the admin page (/api/auth/...)
+app.use('/api', adminRoutes);   // the office admin page; every /api/admin/... needs a login (lib/auth.js)
 
 // 3. The customer's private status page: /status/<long random code>
 //    Every code gets the same page; js/status.js reads the code from the address and asks /api/status/<code>.

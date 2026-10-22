@@ -218,6 +218,20 @@ CREATE TABLE payments (
 
 
 -- ---------------------------------------------------------------------
+-- 7b. LOGIN AUDIT: every try to log in to the admin page, right or wrong
+--     (CLAUDE.md "Admin security"). Also used to slow down guessing:
+--     5 wrong tries from one address = wait 15 minutes.
+-- ---------------------------------------------------------------------
+CREATE TABLE login_audit (
+  id         INTEGER PRIMARY KEY,               -- Postgres: GENERATED ALWAYS AS IDENTITY
+  ip         TEXT NOT NULL,                     -- the address the try came from
+  success    INTEGER NOT NULL CHECK (success IN (0, 1)),   -- 1 = right password (Postgres: BOOLEAN)
+  user_agent TEXT,                              -- which browser/phone, for spotting strange logins
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))        -- Postgres: now()
+);
+
+
+-- ---------------------------------------------------------------------
 -- 8. INDEXES: like the index at the back of a book. They make common
 --    searches fast. They don't change any data.
 -- ---------------------------------------------------------------------
@@ -227,5 +241,6 @@ CREATE INDEX idx_bookings_status     ON bookings(status);
 CREATE INDEX idx_bookings_event_date ON bookings(event_date);
 CREATE INDEX idx_lines_booking       ON booking_lines(booking_id);
 CREATE INDEX idx_payments_booking    ON payments(booking_id);
+CREATE INDEX idx_login_audit_ip     ON login_audit(ip, created_at);
 
 -- The reviews table (build step 7) will be added when we get there.

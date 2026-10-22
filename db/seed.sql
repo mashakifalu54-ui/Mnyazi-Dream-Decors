@@ -24,7 +24,7 @@ INSERT INTO settings (key, value) VALUES
   ('quote_valid_days', '14'),
   -- The version of the table design. server.js compares it with the number it expects,
   -- so an old database is spotted straight away. Raise both when schema.sql changes.
-  ('schema_version',   '4');
+  ('schema_version',   '5');
 
 
 -- ---------- Budget ranges (the one-tap chips in the budget finder) ----------

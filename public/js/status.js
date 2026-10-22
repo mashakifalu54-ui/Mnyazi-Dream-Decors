@@ -51,6 +51,17 @@ function showBooking(booking) {
 
   showTimeline(booking);
   showLines(booking.quote);
+
+  // Download button: a quote while the office is checking, an invoice once they have confirmed
+  // (the same rule as lib/documents.js)
+  const isQuote = ['new', 'needs_price', 'declined'].includes(booking.status);
+  const pdf = document.createElement('a');
+  pdf.className = 'btn btn-outline';
+  pdf.href = '/api/status/' + encodeURIComponent(token) + '/pdf';
+  pdf.target = '_blank';
+  pdf.rel = 'noopener';
+  pdf.textContent = isQuote ? 'Download quote (PDF)' : 'Download invoice (PDF)';
+  document.getElementById('statusLines').appendChild(pdf);
 }
 
 

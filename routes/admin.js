@@ -7,6 +7,7 @@
 //   GET  /api/admin/bookings/:id                     -> one booking
 //   POST /api/admin/bookings/:id                     -> save prices, transport, discount, notes
 //   POST /api/admin/bookings/:id/status  { action, reason }  -> confirm / decline / cancel / complete
+//   GET  /api/admin/bookings/:id/pdf?type=quote|invoice  -> the document as a PDF
 //   GET  /api/admin/catalogue                        -> items, packages, settings (including hidden ones)
 //   POST /api/admin/items          | /items/:id      -> add an item | change one
 //   POST /api/admin/packages       | /packages/:id   -> add a package | change one
@@ -18,6 +19,8 @@ const express = require('express');
 const auth = require('../lib/auth');
 const office = require('../lib/office');
 const catalogue = require('../lib/office-catalogue');
+const { sendPdf } = require('./bookings');
+const { documentTypeFor } = require('../lib/documents');
 
 const router = express.Router();
 
@@ -50,6 +53,14 @@ router.post('/admin/bookings/:id/status', function (request, response) {
   const result = office.changeStatus(Number(request.params.id), body.action, body.reason);
   if (result.error) { return response.status(400).json(result); }
   response.json(office.getBookingForOffice(Number(request.params.id)));
+});
+
+router.get('/admin/bookings/:id/pdf', function (request, response) {
+  const booking = office.getBookingForOffice(Number(request.params.id));
+  if (!booking) { return response.status(404).json({ error: 'Booking not found.' }); }
+  // The office may ask for either; without ?type= it gets the one that fits the status
+  const type = ['quote', 'invoice'].includes(request.query.type) ? request.query.type : documentTypeFor(booking.status);
+  sendPdf(request, response, booking.id, type);
 });
 
 // ---------- Items, prices, packages, settings ----------

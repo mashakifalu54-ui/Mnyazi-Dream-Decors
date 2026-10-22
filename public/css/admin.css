@@ -247,3 +247,7 @@ button.btn-small { min-height: 44px; padding: 0 18px; font-size: 14px; }
   .item-edit-row .grow { grid-column: auto; }
   .package-edit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Quote PDF / Invoice PDF buttons side by side */
+.pdf-links { display: flex; gap: 10px; }
+#actions .pdf-links .btn { width: auto; flex: 1; }

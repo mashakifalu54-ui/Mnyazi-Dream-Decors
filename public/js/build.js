@@ -535,6 +535,7 @@ function showSent(result) {
     + '<p>Your request <b>' + escapeHtml(result.bookingNo) + '</b> is with the office. They check your date and reply on WhatsApp, usually within 24 hours.</p>'
     + '<p class="summary-note">Save your private status link. It shows your booking any time:</p>'
     + '<p class="status-link"><a href="/status/' + result.token + '">' + escapeHtml(statusLink) + '</a></p>'
+    + '<p><a href="/api/status/' + result.token + '/pdf" target="_blank" rel="noopener">Download your quote (PDF)</a></p>'
     + '</div>';
 
   reviewFoot.innerHTML = '<a class="btn btn-outline" href="https://wa.me/?text=' + shareText + '" target="_blank" rel="noopener">Save it on WhatsApp</a>'

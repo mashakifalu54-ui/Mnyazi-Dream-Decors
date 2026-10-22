@@ -124,6 +124,8 @@ function showSettings() {
   document.getElementById('settingsForm').innerHTML = '<h2>Settings</h2>'
     + '<label class="field">Deposit to hold the date (%)<input name="depositPercent" type="number" min="0" max="100" inputmode="numeric" value="' + data.settings.depositPercent + '"></label>'
     + '<label class="field">A quote is valid for (days)<input name="quoteValidDays" type="number" min="1" max="90" inputmode="numeric" value="' + data.settings.quoteValidDays + '"></label>'
+    + '<label class="field">M-Pesa Paybill or Till number (printed on quotes and invoices)<input name="mpesaPaybill" inputmode="numeric" maxlength="7" placeholder="not set yet" value="' + escapeHtml(data.settings.mpesaPaybill) + '"></label>'
+    + '<label class="field">Balance due how many days before the event?<input name="balanceDueDays" type="number" min="0" max="60" inputmode="numeric" placeholder="not set yet" value="' + escapeHtml(data.settings.balanceDueDays) + '"></label>'
     + '<p class="summary-note">New bookings use the new deposit %. Bookings already made keep theirs.</p>'
     + '<div class="form-foot"><button class="btn btn-navy btn-small" type="submit">Save settings</button><span class="form-message" role="status"></span></div>';
 }

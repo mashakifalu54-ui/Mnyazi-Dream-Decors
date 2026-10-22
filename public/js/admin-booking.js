@@ -188,6 +188,13 @@ function actionsHtml() {
     parts.push('<button class="btn btn-navy" type="button" data-action="complete">Mark event completed</button>');
   }
 
+  // The documents, made from this booking right now (lib/documents.js + lib/pdf.js)
+  const confirmed = !['new', 'needs_price', 'declined'].includes(s);
+  parts.push('<div class="pdf-links">'
+    + '<a class="btn btn-outline btn-small" href="/api/admin/bookings/' + booking.id + '/pdf?type=quote" target="_blank" rel="noopener">Quote PDF</a>'
+    + (confirmed ? '<a class="btn btn-outline btn-small" href="/api/admin/bookings/' + booking.id + '/pdf?type=invoice" target="_blank" rel="noopener">Invoice PDF</a>' : '')
+    + '</div>');
+
   // WhatsApp the client at any time, with the private status link
   parts.push('<a class="btn btn-outline" href="' + whatsAppLink(false) + '" target="_blank" rel="noopener">Send on WhatsApp</a>');
 

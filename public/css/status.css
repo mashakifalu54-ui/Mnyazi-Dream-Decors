@@ -48,3 +48,7 @@
   .status-page { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .status-card:last-child { grid-column: 1 / -1; }
 }
+
+/* The Download PDF button under the quote */
+#statusLines .btn { margin-top: 8px; align-self: flex-start; }
+#statusLines { display: flex; flex-direction: column; }

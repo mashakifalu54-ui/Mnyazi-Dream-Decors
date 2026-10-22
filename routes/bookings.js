@@ -2,11 +2,14 @@
 //
 //   POST /api/bookings          the customer sends their picks + event details; we save the booking
 //   GET  /api/status/:token     the private status page asks for its booking
+//   GET  /api/status/:token/pdf the customer downloads their quote (or invoice, once confirmed)
 //
 // No SQL here (CLAUDE.md): the work is done in lib/bookings.js.
 
 const express = require('express');
-const { createBooking, getBookingByToken } = require('../lib/bookings');
+const { createBooking, getBookingByToken, getBookingIdByToken } = require('../lib/bookings');
+const { documentTypeFor, getDocumentData } = require('../lib/documents');
+const { writeDocumentPdf } = require('../lib/pdf');
 
 const router = express.Router();
 
@@ -54,4 +57,23 @@ router.get('/status/:token', function (request, response) {
   response.json(booking);
 });
 
+router.get('/status/:token/pdf', function (request, response) {
+  const booking = getBookingIdByToken(request.params.token);
+  if (!booking) { return response.status(404).json({ error: 'We could not find this booking.' }); }
+  sendPdf(request, response, booking.id, documentTypeFor(booking.status), request.params.token);
+});
+
+// Shared with routes/admin.js: make the PDF and send it to the browser as a download
+function sendPdf(request, response, bookingId, type, token) {
+  const data = getDocumentData(bookingId, type);
+  if (!data) { return response.status(404).json({ error: 'Booking not found.' }); }
+  const fileName = data.number + '-' + data.type + '.pdf';                          // MDD-2026-0001-quote.pdf
+  response.setHeader('Content-Type', 'application/pdf');
+  // "inline" = open it in the browser's PDF viewer (it can be saved or printed from there)
+  response.setHeader('Content-Disposition', 'inline; filename="' + fileName + '"');
+  const statusLink = request.protocol + '://' + request.get('host') + '/status/' + (token || data.statusToken);
+  writeDocumentPdf(data, response, statusLink);
+}
+
 module.exports = router;
+module.exports.sendPdf = sendPdf;

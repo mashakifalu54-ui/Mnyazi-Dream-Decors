@@ -22,6 +22,8 @@ INSERT INTO settings (key, value) VALUES
   ('booking_prefix',   'MDD'),      -- booking numbers look like MDD-2026-0001
   ('deposit_percent',  '50'),       -- still to be confirmed by the client
   ('quote_valid_days', '14'),
+  ('mpesa_paybill',    ''),       -- Paybill or Till number for the documents; empty until the client gives it
+  ('balance_due_days', ''),       -- balance due this many days before the event; empty = "before set-up day"
   -- The version of the table design. server.js compares it with the number it expects,
   -- so an old database is spotted straight away. Raise both when schema.sql changes.
   ('schema_version',   '5');

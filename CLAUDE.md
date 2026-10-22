@@ -89,3 +89,6 @@ SQLite now; PostgreSQL later as a learning step (local Postgres first, then a ho
 - Only db/connection.js knows which database is used.
 - Write standard SQL: avoid SQLite-only features where a standard one exists. Note the known differences in comments: datetime('now') vs now(), INTEGER PRIMARY KEY vs GENERATED ALWAYS AS IDENTITY, ? vs $1 placeholders, synchronous node:sqlite vs async pg (await).
 - Money stays in whole shillings (INTEGER), dates as 'YYYY-MM-DD' text now (DATE in Postgres).
+
+## Admin security (decided 22 Oct 2026, build step 5)
+The admin page itself is not the lock; the server is. Every /api/admin/* route goes through one requireAdmin middleware (Express) that answers 404 when there is no valid session. Passwords hashed with node:crypto scrypt + random salt, compared with timingSafeEqual. Session cookie httpOnly, sameSite 'lax', secure when live. Login rate limit (5 tries, then 15 min wait per IP) and every login written to an audit table. Admin pages carry noindex. No IP whitelisting (Kenyan mobile IPs change). Explained in the playbook, Module 13.

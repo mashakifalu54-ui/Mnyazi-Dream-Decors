@@ -62,7 +62,7 @@ See CLAUDE.md for the quote, invoice, receipt flow, WhatsApp sending and the rev
 ## Rate card (20 Oct 2026)
 Old 2024 rate card received: docs/rate-card-2024.pdf, data in db/packages-2024.json. Use for the prototype; the updated card is coming from the client. See CLAUDE.md "Real packages".
 
-## Ideas for later (parked 22 Oct 2026, not to be built yet)
+## Future update, version 2 (parked 22 Oct 2026): Timothy builds these himself once he has more experience
 ### Lessons from other sites
 What we studied and what to borrow. Earlier ones are already above: SimplyBook.me case study (categories, add-ons, intake form, deposits, notifications), True Safari Adventure (budget finder), Zoho "build systems not websites" video (WhatsApp reminders, local search pages, monthly care).
 

@@ -94,4 +94,4 @@ SQLite now; PostgreSQL later as a learning step (local Postgres first, then a ho
 The admin page itself is not the lock; the server is. Every /api/admin/* route goes through one requireAdmin middleware (Express) that answers 404 when there is no valid session. Passwords hashed with node:crypto scrypt + random salt, compared with timingSafeEqual. Session cookie httpOnly, sameSite 'lax', secure when live. Login rate limit (5 tries, then 15 min wait per IP) and every login written to an audit table. Admin pages carry noindex. No IP whitelisting (Kenyan mobile IPs change). Explained in the playbook, Module 13.
 
 ## Ideas parked (22 Oct 2026)
-Timothy cancelled the "lessons from other sites" features for now (too much to learn at once). Do NOT build them. They are kept in PROJECT-NOTES.md under "Ideas for later" and will only be built when Timothy asks.
+Planned as a FUTURE UPDATE (version 2): Timothy will build these himself later, after gaining skill on other projects. Do NOT build them now. They are kept in PROJECT-NOTES.md under "Ideas for later" and will only be built when Timothy asks.

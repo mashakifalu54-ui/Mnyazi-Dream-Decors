@@ -107,6 +107,20 @@ CREATE TABLE package_includes (
 -- 4b. EVENT TYPES: the choices in the "Type of event" box (from the rate card).
 -- ---------------------------------------------------------------------
 CREATE TABLE event_types (
+  id               INTEGER PRIMARY KEY,
+  name             TEXT NOT NULL UNIQUE,
+  -- Which package group suits this event (the budget finder shows those first).
+  -- Must match packages.category, e.g. 'White Wedding'. Empty = show every package.
+  package_category TEXT,
+  sort_order       INTEGER NOT NULL DEFAULT 0
+);
+
+
+-- ---------------------------------------------------------------------
+-- 4c. AREAS: where the event is (budget finder and booking form).
+--     The office will add transport fees per area later.
+-- ---------------------------------------------------------------------
+CREATE TABLE areas (
   id         INTEGER PRIMARY KEY,
   name       TEXT NOT NULL UNIQUE,
   sort_order INTEGER NOT NULL DEFAULT 0

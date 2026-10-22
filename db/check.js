@@ -35,7 +35,8 @@ for (const pack of catalogue.getPackages()) {
 
 // ---------- Lists for the forms ----------
 console.log('\nBUDGET CHIPS: ' + catalogue.getBudgetRanges().map((r) => r.label).join(' | '));
-console.log('EVENT TYPES:  ' + catalogue.getEventTypes().join(', '));
+console.log('EVENT TYPES:  ' + catalogue.getEventTypes().map((t) => t.name).join(', '));
+console.log('AREAS:        ' + catalogue.getAreas().join(', '));
 
 // ---------- Office reminders (never shown to customers) ----------
 const db = openDatabase();

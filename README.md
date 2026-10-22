@@ -24,6 +24,7 @@ Data for the browser: `/api/items`, `/api/packages`, `/api/options`, and `POST /
 - `routes/`: the web addresses the server answers (`routes/items.js` = price list and packages)
 - `lib/`: shared functions; ALL the SQL lives here (`catalogue.js` prices and packages, `settings.js` office settings, `quote.js` prices a quote)
 - `public/js/quote-math.js`: the one function that works out totals, used by BOTH the browser and the server
+- `public/js/budget-fit.js`: picks the packages that fit a budget, guest count and event type
 - `db/`: the database: tables (`schema.sql`), starting data (`seed.sql`) and the scripts that use them
 - `data/`: the database file itself (not saved to GitHub because it holds customer details)
 
@@ -31,4 +32,5 @@ Data for the browser: `/api/items`, `/api/packages`, `/api/options`, and `POST /
 1. Database and price list: done
 2. Price list on the page from the database: done (packages from the 2024 rate card)
 3. Quote and total: done (build.html)
-4. Budget finder, then save the booking: next
+3b. Budget finder: done (top of build.html; logic in public/js/budget-fit.js)
+4. Save the booking: next

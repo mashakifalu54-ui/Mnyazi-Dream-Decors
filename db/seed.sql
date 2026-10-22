@@ -24,7 +24,7 @@ INSERT INTO settings (key, value) VALUES
   ('quote_valid_days', '14'),
   -- The version of the table design. server.js compares it with the number it expects,
   -- so an old database is spotted straight away. Raise both when schema.sql changes.
-  ('schema_version',   '3');
+  ('schema_version',   '4');
 
 
 -- ---------- Budget ranges (the one-tap chips in the budget finder) ----------
@@ -220,7 +220,21 @@ INSERT INTO package_includes (package_id, line, sort_order) VALUES
 
 
 -- ---------- Event types (from the rate card, plus Funeral and Other) ----------
-INSERT INTO event_types (name, sort_order) VALUES
-  ('Wedding', 1), ('Malozi / Kuhaswa', 2), ('Church', 3), ('Baby Shower', 4),
-  ('Birthday', 5), ('Graduation', 6), ('Farewell', 7), ('Corporate', 8),
-  ('Funeral', 9), ('Other', 10);
+-- package_category = the package group the budget finder suggests (NULL = all packages)
+INSERT INTO event_types (name, package_category, sort_order) VALUES
+  ('Wedding',          'White Wedding',     1),
+  ('Malozi / Kuhaswa', 'Malozi / Kuhaswa',  2),
+  ('Church',           'Church',            3),
+  ('Baby Shower',      NULL,                4),
+  ('Birthday',         NULL,                5),
+  ('Graduation',       NULL,                6),
+  ('Farewell',         NULL,                7),
+  ('Corporate',        NULL,                8),
+  ('Funeral',          NULL,                9),
+  ('Other',            NULL,               10);
+
+
+-- ---------- Areas (from CLAUDE.md) ----------
+INSERT INTO areas (name, sort_order) VALUES
+  ('Kilifi town', 1), ('Mnarani', 2), ('Malindi', 3), ('Watamu', 4),
+  ('Mtwapa', 5), ('Mombasa', 6), ('Other', 7);

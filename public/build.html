@@ -6,6 +6,7 @@
   - The maths is in js/quote-math.js: the SAME file the server uses.
   - "Review quote" asks the server to price the quote (/api/quote), so what the
     customer sees in the review is exactly what will be saved in step 4.
+  - The budget finder's thinking is in js/budget-fit.js.
   Header, footer and contact buttons are copied from prices.html.
 -->
 <html lang="en">
@@ -79,6 +80,39 @@
       <!-- ===================== LEFT: CHOICES ===================== -->
       <div class="builder-main">
 
+        <!-- Budget finder (CLAUDE.md): every field optional; js/build.js does the work -->
+        <section class="build-block finder" id="finder" aria-labelledby="finderTitle">
+          <h2 id="finderTitle">What fits your budget?</h2>
+          <p class="section-intro">Tell us a little about your event and we show the packages that fit. Every question is optional.</p>
+          <form id="finderForm" novalidate>
+            <div class="finder-fields">
+              <label class="field">Type of event
+                <select id="finderEvent"><option value="">Choose…</option></select>
+              </label>
+              <label class="field">Guests
+                <input id="finderGuests" type="number" min="1" max="5000" inputmode="numeric" placeholder="e.g. 120">
+              </label>
+              <label class="field">Area
+                <select id="finderArea"><option value="">Choose…</option></select>
+              </label>
+            </div>
+            <!-- Budget chips are radio buttons dressed as chips: one tap, and keyboards and screen readers understand them -->
+            <fieldset class="budget-chips">
+              <legend>Budget for décor (KES) <small>tents and chairs come on top</small></legend>
+              <div class="chips" id="budgetChips"></div>
+            </fieldset>
+            <label class="field field-exact">…or type an exact amount (KES)
+              <input id="finderExact" type="number" min="1000" step="500" inputmode="numeric" placeholder="e.g. 55000">
+            </label>
+            <p class="field-error" id="finderError" role="alert" hidden></p>
+            <div class="finder-actions">
+              <button class="btn btn-gold" type="submit">Show what fits</button>
+              <a class="btn btn-outline" href="#packages">Skip, I'll choose myself</a>
+            </div>
+          </form>
+          <div id="finderResults" aria-live="polite"></div>
+        </section>
+
         <!-- Packages -->
         <section class="build-block" id="packages" aria-labelledby="packagesTitle">
           <h2 id="packagesTitle">Start from a package</h2>
@@ -120,6 +154,11 @@
         <div class="summary-lines" id="summaryLines"></div>
         <div class="summary-total"><span>Total</span><b id="summaryTotal">KES 0</b></div>
         <div class="summary-deposit"><span>Deposit to hold the date (<span class="deposit-percent">50</span>%)</span><b id="summaryDeposit">KES 0</b></div>
+        <!-- Budget bar: only shown once the customer has given a budget -->
+        <div class="budget-bar" id="budgetBar" hidden>
+          <div class="budget-track"><span id="budgetFill"></span></div>
+          <p id="budgetText"></p>
+        </div>
         <p class="summary-note" id="summaryNote" hidden></p>
         <button class="btn btn-gold" type="button" data-open-review>Review quote</button>
       </aside>
@@ -229,6 +268,7 @@
 
   <script src="js/common.js"></script>
   <script src="js/quote-math.js"></script>
+  <script src="js/budget-fit.js"></script>
   <script src="js/build.js"></script>
 </body>
 

@@ -296,3 +296,77 @@ button.btn { font: inherit; font-weight: 800; cursor: pointer; }
   cursor: pointer;
 }
 @media (prefers-color-scheme: dark) { .link-btn { color: #ff8a80; } }
+
+/* ---------- Budget finder ---------- */
+.finder {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.finder-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);   /* phones: one question per line */
+  gap: 12px;
+  margin-top: 18px;
+}
+.field select {
+  height: 48px;
+  padding: 0 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+}
+.budget-chips { border: 0; padding: 0; margin: 18px 0 0; }
+.budget-chips legend { font-size: 14px; font-weight: 700; color: var(--muted); padding: 0; }
+.budget-chips legend small { font-weight: 500; }
+.budget-chips .chips { flex-wrap: wrap; margin: 10px 0 0; overflow: visible; }
+
+/* A radio button dressed as a chip: the real circle is hidden but still works with the keyboard */
+.chip-radio { position: relative; }
+.chip-radio input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip-radio:has(input:checked) { background: var(--navy); border-color: var(--navy); color: #fff; }
+.chip-radio:has(input:focus-visible) { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.field-exact { margin-top: 14px; max-width: 320px; }
+.finder-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+#finderResults:not(:empty) { margin-top: 28px; }
+.finder-heading { font-size: 24px; margin-bottom: 14px; }
+.finder-empty { background: var(--tint); border-radius: var(--radius); padding: 18px; }
+.finder-empty p { margin: 0 0 12px; }
+
+/* "Uses KES 60,000 of your KES 60,000" / "KES 10,000 over your budget" */
+.fit-badge {
+  align-self: flex-start;
+  margin: 0 0 10px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  background: #ddf3e6;
+  color: #135c34;
+}
+.fit-badge.is-over { background: #fdecc8; color: #7a4b00; }
+.fit-tip { font-size: 14px; color: var(--gold-text); font-weight: 600; margin-top: 8px; }
+
+/* ---------- Budget bar under the total ---------- */
+.budget-bar p { margin: 6px 0 0; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.budget-track { height: 8px; border-radius: 999px; background: var(--tint); overflow: hidden; }
+.budget-track span { display: block; height: 100%; width: 0; background: #2e8b57; transition: width 0.4s; }
+.budget-bar.is-near .budget-track span { background: var(--gold); }
+.budget-bar.is-over .budget-track span { background: #b3261e; }
+.budget-bar.is-over p { color: #b3261e; }
+
+@media (prefers-color-scheme: dark) {
+  .fit-badge { background: #173a28; color: #7fd6a2; }
+  .fit-badge.is-over { background: #3a2a10; color: #f2b866; }
+  .budget-bar.is-over p { color: #ff8a80; }
+}
+
+@media (min-width: 640px) {
+  .finder-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

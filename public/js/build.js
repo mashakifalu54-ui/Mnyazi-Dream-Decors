@@ -7,6 +7,8 @@
   5. Custom requests ("price pending")
   6. Totals: uses calculateQuote() from quote-math.js (the same maths as the server)
   7. Review: asks the SERVER to price the quote (/api/quote) and shows the answer
+  8. Budget finder: event type, guests, budget, area -> packages that fit (js/budget-fit.js),
+     and the budget bar under the total
   Uses kes() and escapeHtml() from common.js.
 */
 
@@ -14,7 +16,10 @@
 // items:    { itemId: qty }        e.g. { 1: 3, 2: 2 }  = 3 tents, 2 side covers
 // packages: [ packageId, ... ]     each package once
 // custom:   [ { name, qty }, ... ] requests the office will price
-let cart = { items: {}, packages: [], custom: [] };
+// wish:     what the customer told the budget finder, or null:
+//           { eventType, guests, area, budgetMin, budgetMax, budgetLabel, rangeId }
+//           Kept with the cart so step 4 can save it on the booking.
+let cart = { items: {}, packages: [], custom: [], wish: null };
 
 // Saved in the browser (localStorage) so a refresh or "back" never loses the customer's choices.
 // try/catch: some browsers block storage (private mode); then the page still works, it just forgets.
@@ -37,6 +42,8 @@ let packagesById = {};
 let depositPercent = 50;
 let currentCategory = 'all';
 let currentPackageGroup = null;
+let eventTypes = [];                  // [ { name, package_category } ]
+let budgetRanges = [];
 
 async function loadPage() {
   try {
@@ -48,6 +55,9 @@ async function loadPage() {
     priceGroups = groups;
     allPackages = packages;
     depositPercent = options.depositPercent;
+    eventTypes = options.eventTypes;
+    budgetRanges = options.budgetRanges;
+    setUpFinder(options.areas);
     groups.forEach((group) => group.items.forEach((item) => { itemsById[item.id] = item; }));
     packages.forEach((pack) => { packagesById[pack.id] = pack; });
     document.querySelectorAll('.deposit-percent').forEach((el) => { el.textContent = depositPercent; });
@@ -280,6 +290,7 @@ function updateTotals() {
   document.getElementById('summaryDeposit').textContent = kes(quote.deposit);
 
   countTo(quote.total);
+  updateBudgetBar(quote.total);
 }
 
 // The total "counts up" to its new value (DESIGN-PROMPT.md); instant if motion is switched off
@@ -381,6 +392,169 @@ document.querySelectorAll('[data-open-review]').forEach((button) => button.addEv
 document.getElementById('reviewClose').addEventListener('click', () => review.close());
 document.getElementById('reviewBack').addEventListener('click', () => review.close());
 review.addEventListener('click', (event) => { if (event.target === review) { review.close(); } });   // tap outside = close
+
+
+// ---------- 8. Budget finder ----------
+const finderForm = document.getElementById('finderForm');
+const finderResults = document.getElementById('finderResults');
+
+// Fill the drop-downs and chips from /api/options, and put back what the customer chose last time
+function setUpFinder(areas) {
+  const eventBox = document.getElementById('finderEvent');
+  eventTypes.forEach((type) => eventBox.add(new Option(type.name, type.name)));   // new Option(text, value)
+  const areaBox = document.getElementById('finderArea');
+  areas.forEach((area) => areaBox.add(new Option(area, area)));
+
+  // One radio button per budget range, dressed as a chip (the <label> is what you see and tap)
+  document.getElementById('budgetChips').innerHTML = budgetRanges.map((range) =>
+    '<label class="chip chip-radio"><input type="radio" name="budget" value="' + range.id + '">' + escapeHtml(range.label) + '</label>'
+  ).join('');
+
+  const wish = cart.wish;
+  if (wish) {
+    eventBox.value = wish.eventType || '';
+    areaBox.value = wish.area || '';
+    document.getElementById('finderGuests').value = wish.guests || '';
+    if (wish.rangeId) {
+      const radio = finderForm.querySelector('input[name="budget"][value="' + wish.rangeId + '"]');
+      if (radio) { radio.checked = true; }
+    } else if (wish.budgetMax) {
+      document.getElementById('finderExact').value = wish.budgetMax;
+    }
+    showFinderResults(wish);   // came back to the page: show their results again
+  }
+}
+
+// Typing an exact amount un-ticks the chip, and ticking a chip clears the exact amount (only one budget at a time)
+finderForm.addEventListener('input', function (event) {
+  if (event.target.id === 'finderExact' && event.target.value) {
+    finderForm.querySelectorAll('input[name="budget"]').forEach((radio) => { radio.checked = false; });
+  }
+  if (event.target.name === 'budget') { document.getElementById('finderExact').value = ''; }
+});
+
+finderForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  const error = document.getElementById('finderError');
+  error.hidden = true;
+
+  const eventType = document.getElementById('finderEvent').value;
+  const area = document.getElementById('finderArea').value;
+  const guestsText = document.getElementById('finderGuests').value;
+  const exactText = document.getElementById('finderExact').value;
+  const ticked = finderForm.querySelector('input[name="budget"]:checked');
+
+  // Check the numbers, with plain words next to the form (DESIGN-PROMPT.md)
+  const guests = guestsText ? Math.floor(Number(guestsText)) : null;
+  if (guestsText && !(guests >= 1 && guests <= 5000)) { return showFinderError('Guests: use a whole number, for example 120.'); }
+  const exact = exactText ? Math.round(Number(exactText)) : null;
+  if (exactText && !(exact >= 1000)) { return showFinderError('Budget: type an amount of at least 1,000, or tap one of the ranges.'); }
+
+  // Turn the choices into a "wish". An exact amount is saved as min = max (CLAUDE.md).
+  const wish = { eventType: eventType || null, area: area || null, guests: guests, budgetMin: null, budgetMax: null, budgetLabel: null, rangeId: null };
+  if (exact) {
+    wish.budgetMin = exact;
+    wish.budgetMax = exact;
+    wish.budgetLabel = kes(exact);
+  } else if (ticked) {
+    const range = budgetRanges.find((r) => String(r.id) === ticked.value);
+    wish.budgetMin = range.min_amount;
+    wish.budgetMax = range.max_amount;
+    wish.budgetLabel = 'KES ' + range.label;
+    wish.rangeId = range.id;
+  }
+
+  cart.wish = wish;
+  saveCart();
+  updateTotals();      // the budget bar appears under the total
+  showFinderResults(wish);
+
+  function showFinderError(message) {
+    error.textContent = message;
+    error.hidden = false;
+  }
+});
+
+function showFinderResults(wish) {
+  const type = eventTypes.find((t) => t.name === wish.eventType);
+  const category = type ? type.package_category : null;
+  const results = findPackagesThatFit(allPackages, {
+    budgetMin: wish.budgetMin, budgetMax: wish.budgetMax, guests: wish.guests, category: category
+  });
+
+  // Nothing fits: say so kindly, name the cheapest choice, and point to single items
+  if (results.length === 0) {
+    const group = allPackages.filter((p) => !category || p.category === category);
+    const cheapest = group.slice().sort((a, b) => a.price - b.price)[0];
+    finderResults.innerHTML = '<div class="finder-empty"><p><b>No package fits ' + escapeHtml(wish.budgetLabel || 'that budget') + '.</b> '
+      + (cheapest ? 'The lowest is ' + escapeHtml(cheapest.name) + ' at ' + kes(cheapest.price) + '. ' : '')
+      + 'You can also pick single items below and watch the total.</p>'
+      + '<a class="btn btn-outline" href="#items">Pick single items</a></div>';
+    return;
+  }
+
+  const fitCount = results.filter((r) => r.fits).length;
+  const heading = '<h3 class="finder-heading">' + fitCount + ' package' + (fitCount === 1 ? '' : 's') + ' fit'
+    + (wish.budgetLabel ? ' ' + escapeHtml(wish.budgetLabel) : ' your event')
+    + (category ? ' · ' + escapeHtml(category) : '') + '</h3>';
+
+  finderResults.innerHTML = heading + '<div class="package-grid">' + results.map(function (r) {
+    const pack = r.pack;
+    const chosen = cart.packages.includes(pack.id);
+
+    // "uses KES X of your budget" or "KES X over" (CLAUDE.md)
+    let badge = '';
+    if (r.fits && wish.budgetMax) {
+      badge = '<p class="fit-badge">Uses ' + kes(pack.price) + ' of your ' + kes(wish.budgetMax) + '</p>';
+    } else if (!r.fits) {
+      badge = '<p class="fit-badge is-over">' + kes(r.overBy) + ' over your budget</p>';
+    }
+    const tips = [];
+    if (!r.fits && r.cheaperOption) {
+      tips.push('Or choose ' + escapeHtml(r.cheaperOption.name) + ' (' + kes(r.cheaperOption.price) + '), or ask the office what can be left out.');
+    }
+    if (r.seatsShort) {
+      tips.push('Seats ' + pack.guests_seated + ': for ' + wish.guests + ' guests, hire ' + r.seatsShort + ' more seats on top.');
+    }
+    const lines = pack.includes.map((line) => '<li>' + escapeHtml(line) + '</li>').join('');
+    const button = chosen
+      ? '<button class="btn btn-outline" type="button" data-remove-package="' + pack.id + '">Added ✓ · Remove</button>'
+      : '<button class="btn btn-gold" type="button" data-add-package="' + pack.id + '">Add this package</button>';
+    return '<article class="package-card' + (chosen ? ' is-chosen' : '') + '">'
+      + badge
+      + '<h3>' + escapeHtml(pack.category === category ? pack.name : pack.category + ': ' + pack.name) + '</h3>'
+      + '<p class="package-price">' + kes(pack.price) + '</p>'
+      + (pack.guests_seated ? '<p class="package-seats">Up to ' + pack.guests_seated + ' guests seated</p>' : '')
+      + (tips.length ? '<p class="fit-tip">' + tips.join(' ') + '</p>' : '')
+      + '<ul>' + lines + '</ul>' + button + '</article>';
+  }).join('') + '</div>';
+}
+
+// Add / Remove in the results works like the package cards further down
+finderResults.addEventListener('click', function (event) {
+  const add = event.target.closest('[data-add-package]');
+  const remove = event.target.closest('[data-remove-package]');
+  if (add) { cart.packages.push(Number(add.dataset.addPackage)); }
+  if (remove) { cart.packages = cart.packages.filter((id) => id !== Number(remove.dataset.removePackage)); }
+  if (add || remove) { changed(); showPackages(); showFinderResults(cart.wish); }
+});
+
+// The budget bar under the total: "KES 62,000 of 80,000 used, 18,000 left" (CLAUDE.md)
+function updateBudgetBar(total) {
+  const bar = document.getElementById('budgetBar');
+  const wish = cart.wish;
+  if (!wish || !wish.budgetMax) { bar.hidden = true; return; }   // no budget, or "Above 100,000": nothing to measure against
+
+  const budget = wish.budgetMax;
+  const usedPercent = Math.min(100, Math.round(total / budget * 100));   // at most 100 for the drawing
+  bar.hidden = false;
+  bar.classList.toggle('is-near', total <= budget && total >= budget * 0.9);   // gold when 90% is used
+  bar.classList.toggle('is-over', total > budget);                              // warning colour when over
+  document.getElementById('budgetFill').style.width = usedPercent + '%';
+  document.getElementById('budgetText').textContent = total > budget
+    ? kes(total - budget) + ' over your ' + kes(budget) + ' budget. You can still send it: the office will help you adjust.'
+    : kes(total) + ' of ' + kes(budget) + ' used, ' + kes(budget - total) + ' left';
+}
 
 
 loadPage();

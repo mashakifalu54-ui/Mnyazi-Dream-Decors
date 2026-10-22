@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!--
+  ADMIN: items, prices, packages and settings (build step 5).
+  Filled by js/admin-catalogue.js; saved through /api/admin/items, /packages, /settings.
+  Office only: the data comes from /api/admin/..., which needs the password (lib/auth.js).
+  Every address starts with "/" because these pages live inside /admin/.
+-->
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <!-- Makes the page fit phone screens instead of showing a tiny desktop page -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Tells the browser this page has both a light and a dark design -->
+  <meta name="color-scheme" content="light dark">
+  <title>Items, prices &amp; packages | Mnyazi Admin</title>
+  <!-- Private page: keep it out of Google (CLAUDE.md) -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Tab icon (favicon): the gold "M" on navy. Browsers pick the format they support. -->
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#15224A">
+
+  <!-- Brand fonts from Google Fonts: Marcellus for headings, Manrope for text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Marcellus&family=Manrope:wght@400;600;700;800&display=swap">
+
+  <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/prices.css">
+  <link rel="stylesheet" href="/css/build.css">
+  <link rel="stylesheet" href="/css/status.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body class="admin-body">
+
+  <!-- ===================== HEADER (navy sidebar on laptops, top bar + Menu on phones) ===================== -->
+  <header class="site-header admin-header">
+    <div class="header-row">
+      <a class="brand" href="/admin/">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-name">Mnyazi Admin</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mainNav">Menu</button>
+      <nav class="main-nav" id="mainNav" aria-label="Admin">
+        <a href="/admin/">Booking requests</a>
+        <a href="/admin/catalogue.html">Items, prices &amp; packages</a>
+        <a href="/" target="_blank" rel="noopener">View the website</a>
+        <button class="link-btn logout" type="button" id="logoutBtn">Log out</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===================== LOGIN (shown when not logged in) ===================== -->
+  <section class="login-box" id="loginBox" hidden aria-labelledby="loginTitle">
+    <form id="loginForm" class="status-card">
+      <h1 id="loginTitle">Office login</h1>
+      <label class="field">Password
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+      </label>
+      <p class="field-error" id="loginError" role="alert" hidden></p>
+      <button class="btn btn-gold" type="submit">Log in</button>
+    </form>
+  </section>
+
+  <!-- ===================== THE PAGE ===================== -->
+  <main class="admin-main" id="adminApp" hidden>
+    <div class="admin-title"><h1>Items, prices &amp; packages</h1></div>
+    <p class="summary-note">Changes show on the website straight away. Old quotes keep the price they were made with.
+      Nothing is deleted: untick "Shown" to hide something.</p>
+
+    <!-- Three parts, one tab each -->
+    <div class="chips" id="tabs" role="tablist" aria-label="Part">
+      <button class="chip" type="button" role="tab" data-tab="items" aria-selected="true">Items &amp; prices</button>
+      <button class="chip" type="button" role="tab" data-tab="packages" aria-selected="false">Packages</button>
+      <button class="chip" type="button" role="tab" data-tab="settings" aria-selected="false">Settings</button>
+    </div>
+
+    <section id="tab-items">
+      <div class="chips" id="categoryFilter" aria-label="Category"></div>
+      <details class="status-card add-box">
+        <summary>+ Add an item</summary>
+        <div id="newItem"></div>
+      </details>
+      <div id="itemList"><p class="loading">Loading…</p></div>
+    </section>
+
+    <section id="tab-packages" hidden>
+      <details class="status-card add-box">
+        <summary>+ Add a package</summary>
+        <div id="newPackage"></div>
+      </details>
+      <div class="package-edit-grid" id="packageList"></div>
+    </section>
+
+    <section id="tab-settings" hidden>
+      <form class="status-card settings-form" id="settingsForm"></form>
+    </section>
+
+    <p class="admin-foot">© <span id="year">2026</span> Mnyazi Dream Decor</p>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/kenya-phone.js"></script>
+  <script src="/js/admin-common.js"></script>
+  <script src="/js/admin-catalogue.js"></script>
+</body>
+
+</html>

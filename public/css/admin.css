@@ -191,3 +191,59 @@ button.btn-small { min-height: 44px; padding: 0 18px; font-size: 14px; }
   .booking-grid { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; }
   .booking-side { position: sticky; top: 24px; }
 }
+
+/* ---------- Items, prices & packages page ---------- */
+.add-box { margin: 8px 0 16px; }
+.add-box summary { cursor: pointer; font-weight: 800; min-height: 32px; }
+.item-edit-list { display: flex; flex-direction: column; gap: 10px; }
+.item-edit {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.add-box .item-edit { border: 0; padding: 0; }
+.is-hidden-item { opacity: 0.6; border-style: dashed; }   /* hidden from customers: looks faded */
+.item-edit-row, .package-edit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);   /* phones: two boxes per line */
+  gap: 10px;
+  align-items: end;
+}
+.item-edit-row .grow { grid-column: 1 / -1; }
+.item-edit input, .item-edit select, .package-edit input, .package-edit textarea, .settings-form input {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+.package-edit textarea { height: auto; padding: 10px; resize: vertical; }
+.item-edit .check input, .package-edit .check input { width: 20px; height: 20px; }
+.more summary { cursor: pointer; font-size: 14px; color: var(--muted); font-weight: 700; min-height: 32px; }
+.more .field { margin-top: 8px; }
+.form-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.form-message { font-size: 14px; font-weight: 700; color: var(--muted); }
+.form-message.is-ok { color: #135c34; }
+.form-message.is-error { color: #b3261e; }
+.package-edit-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.settings-form { max-width: 420px; }
+
+@media (prefers-color-scheme: dark) {
+  .form-message.is-ok { color: #7fd6a2; }
+  .form-message.is-error { color: #ff8a80; }
+}
+
+@media (min-width: 900px) {
+  /* Laptops: one item per line: name | category | price | stock | shown */
+  .item-edit-row { grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) 120px 100px auto; }
+  .item-edit-row .grow { grid-column: auto; }
+  .package-edit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

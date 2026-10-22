@@ -26,9 +26,9 @@ Testing without touching your real database: set `MNYAZI_DB` to another file fir
 ## Folders
 - `public/`: the website people see (HTML, CSS, JavaScript, photos)
 - `server.js`: starts the web server
-- `routes/`: the web addresses the server answers (`items.js` price list, `quote.js`, `bookings.js`, `admin.js`)
+- `routes/`: the web addresses the server answers (`items.js` price list, `quote.js`, `bookings.js`, `auth.js` log in/out, `admin.js`)
 - `scripts/`: small helper commands (`set-admin-password.js`)
-- `lib/`: shared functions; ALL the SQL lives here (`catalogue.js` prices and packages, `settings.js` office settings, `quote.js` prices a quote, `bookings.js` saves and reads bookings, `office.js` what the office does with them, `auth.js` the admin password and login)
+- `lib/`: shared functions; ALL the SQL lives here (`catalogue.js` prices and packages, `settings.js` office settings, `quote.js` prices a quote, `bookings.js` saves and reads bookings, `office.js` what the office does with them, `office-catalogue.js` editing items/packages/settings, `auth.js` the admin password and login, `login-audit.js` every login try)
 - `public/js/quote-math.js`: the one function that works out totals, used by BOTH the browser and the server
 - `public/js/budget-fit.js`: picks the packages that fit a budget, guest count and event type
 - `public/js/kenya-phone.js`: checks Kenyan phone numbers (browser and server)
@@ -42,4 +42,5 @@ Testing without touching your real database: set `MNYAZI_DB` to another file fir
 3b. Budget finder: done (top of build.html; logic in public/js/budget-fit.js)
 4. Save the booking: done (details form, booking number MDD-YYYY-NNNN, private status page)
 5. Admin page for the office: booking requests and one booking done (login, prices for custom items, stock on the date, transport, discount, confirm and send on WhatsApp, decline, cancel)
-5b. Admin: edit items, prices and packages: next
+5b. Admin: edit items, prices, packages and settings: done (/admin/catalogue.html)
+6. PDFs (quote, invoice, receipt): next

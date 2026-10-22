@@ -7,12 +7,17 @@
 //   GET  /api/admin/bookings/:id                     -> one booking
 //   POST /api/admin/bookings/:id                     -> save prices, transport, discount, notes
 //   POST /api/admin/bookings/:id/status  { action, reason }  -> confirm / decline / cancel / complete
+//   GET  /api/admin/catalogue                        -> items, packages, settings (including hidden ones)
+//   POST /api/admin/items          | /items/:id      -> add an item | change one
+//   POST /api/admin/packages       | /packages/:id   -> add a package | change one
+//   POST /api/admin/settings                         -> deposit % and quote valid days
 //
-// No SQL here (CLAUDE.md): the work is done in lib/office.js.
+// No SQL here (CLAUDE.md): the work is done in lib/office.js and lib/office-catalogue.js.
 
 const express = require('express');
 const auth = require('../lib/auth');
 const office = require('../lib/office');
+const catalogue = require('../lib/office-catalogue');
 
 const router = express.Router();
 
@@ -45,6 +50,32 @@ router.post('/admin/bookings/:id/status', function (request, response) {
   const result = office.changeStatus(Number(request.params.id), body.action, body.reason);
   if (result.error) { return response.status(400).json(result); }
   response.json(office.getBookingForOffice(Number(request.params.id)));
+});
+
+// ---------- Items, prices, packages, settings ----------
+// Sends back { error } with 400, or the whole fresh catalogue so the page shows what was saved
+function answer(response, result) {
+  if (result.error) { return response.status(400).json(result); }
+  response.json(Object.assign({ savedId: result.id }, catalogue.getCatalogueForOffice()));
+}
+
+router.get('/admin/catalogue', function (request, response) {
+  response.json(catalogue.getCatalogueForOffice());
+});
+router.post('/admin/items', function (request, response) {
+  answer(response, catalogue.saveItem(null, request.body));
+});
+router.post('/admin/items/:id', function (request, response) {
+  answer(response, catalogue.saveItem(Number(request.params.id), request.body));
+});
+router.post('/admin/packages', function (request, response) {
+  answer(response, catalogue.savePackage(null, request.body));
+});
+router.post('/admin/packages/:id', function (request, response) {
+  answer(response, catalogue.savePackage(Number(request.params.id), request.body));
+});
+router.post('/admin/settings', function (request, response) {
+  answer(response, catalogue.saveSettings(request.body));
 });
 
 module.exports = router;

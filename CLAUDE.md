@@ -93,25 +93,5 @@ SQLite now; PostgreSQL later as a learning step (local Postgres first, then a ho
 ## Admin security (decided 22 Oct 2026, build step 5)
 The admin page itself is not the lock; the server is. Every /api/admin/* route goes through one requireAdmin middleware (Express) that answers 404 when there is no valid session. Passwords hashed with node:crypto scrypt + random salt, compared with timingSafeEqual. Session cookie httpOnly, sameSite 'lax', secure when live. Login rate limit (5 tries, then 15 min wait per IP) and every login written to an audit table. Admin pages carry noindex. No IP whitelisting (Kenyan mobile IPs change). Explained in the playbook, Module 13.
 
-## Lessons from other sites (22 Oct 2026)
-What we studied and what to borrow. Earlier ones are already above: SimplyBook.me case study (categories, add-ons, intake form, deposits, notifications), True Safari Adventure (budget finder), Zoho "build systems not websites" video (WhatsApp reminders, local search pages, monthly care).
-
-### Sherehe Events "Plan my event" (shereheevents.co.ke/plan-my-event) - the best model for our Build page
-- One question at a time (a step-by-step planner), not one long form. Start by choosing a starting point: an occasion, a ready package, a few single items, or "something custom".
-- Guest count drives guest-linked items: chairs, tables, linen, table settings and tents resize as soon as guests change. Items the customer set by hand stay as set, and the page says what changed ("Chairs went from 100 to 150"). Our package_items.per_guests already supports this; add a "set by customer" flag on cart lines.
-- Packages priced by guest count in a table (20 / 50 / 100 / 150 / 200 guests), set-up and collection included, delivery added separately. Show Mnyazi's packages the same way once the rules are confirmed.
-- Delivery priced by area: exact for areas the office has priced, marked "estimate" elsewhere. Needs a delivery_areas table (area, fee, is_exact) the office edits.
-- Running "Quote list" + estimate + the 50% deposit always visible.
-- Custom request can include photos and a budget.
-- Finish with "Send on WhatsApp" or "Ask us to call me".
-- "Save & share" with no sign-up: a short code + link; the estimate stays on the customer's phone; anyone opening the link gets their own copy to change. (Store the cart in localStorage plus a share code saved on the server.)
-- States the hire period (24 hours) and loads today's prices from the server.
-
-### Smart Ushering (smartushering.lovable.app) - built with the Lovable AI builder
-- Has a "Track" page: call our private status page "Track my booking" in menus and messages.
-- Has a separate "Concerns" page for complaints: consider one for Mnyazi (goes to the admin inbox).
-- Leaves an "Edit with Lovable" badge: never ship builder badges or placeholder text.
-- Our edge to keep: real quotes, packages, payments, PDFs, reminders, data on a server we control.
-
-### Order to apply these (after step 4 saves bookings)
-1 guest-count resizing with "what changed" note; 2 planner-style steps on the Build page (starting point first); 3 delivery areas with exact/estimate fees; 4 Save & share code; 5 "Ask us to call me" option; 6 rename status page to Track my booking; 7 Concerns page.
+## Ideas parked (22 Oct 2026)
+Timothy cancelled the "lessons from other sites" features for now (too much to learn at once). Do NOT build them. They are kept in PROJECT-NOTES.md under "Ideas for later" and will only be built when Timothy asks.
